@@ -1,4 +1,4 @@
-# Takes one argument, file path to the NPPES data
+# Takes two arguments, first is the database name where the data should be loaded, and the second is the file path to the NPPES data
 
 require 'time'
 require 'pg'
@@ -334,7 +334,7 @@ nppesCsvLayout = {
   healthcare_provider_taxonomy_group_14: 327,
   healthcare_provider_taxonomy_group_15: 328
 }
-conn = PG.connect( dbname: 'fha' )
+conn = PG.connect( dbname: ARGV[0] )
 createProvider = "CREATE TABLE IF NOT EXISTS provider (
   npi bigint PRIMARY KEY,
   entity_type_code int,
@@ -465,7 +465,7 @@ conn.exec(createHealthcareProviderTaxonomyGroup)
 conn.exec(createOtherProvider)
 conn.exec(createTaxonomyTable)
 output = ""
-File.open(ARGV[0], 'r').each_line do |line| 
+File.open(ARGV[1], 'r').each_line do |line| 
   if i == 0 || !line.is_a?(String)
     i = i + 1
     next
