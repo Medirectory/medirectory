@@ -1,9 +1,9 @@
 class CreateSchema < ActiveRecord::Migration
   def change
     create_table :provider do |t|
-      t.integer :npi, :primary_key, :index
+      t.integer :npi, :primary_key, :index, :limit => 8  # sets it up as a long, needs to handle all 10 digit numbers
       t.integer :entity_type_code
-      t.integer :replacement_npi
+      t.integer :replacement_npi, :limit => 8
       t.string :ein
       t.string :organization_name_legal_business_name
       t.string :last_name_legal_name
@@ -21,9 +21,8 @@ class CreateSchema < ActiveRecord::Migration
       t.string :other_name_suffix
       t.string :other_credential
       t.integer :other_last_name_type_code
-      t.integer :business_mailing_address_id_fk
-      t.integer :business_practice_location_address_id_fk
       t.date :enumeration_date
+      t.date :last_update_date
       t.string :npi_deactivation_reason_code
       t.date :npi_deactivation_date
       t.date :npi_reactivation_date
@@ -55,15 +54,16 @@ class CreateSchema < ActiveRecord::Migration
       t.integer :npi_fk
     end
 
-    create_table :other_provider do |t|
-      t.string :other_provider_identifier
-      t.string :other_provider_identifier_type_code
-      t.string :other_provider_identifier_state
-      t.string :other_provider_identifier_issuer
+    create_table :other_provider_identifier do |t|
+      t.string :identifier
+      t.string :identifier_type_code
+      t.string :identifier_state
+      t.string :identifier_issuer
       t.integer :npi_fk
     end
 
     create_table :address do |t|
+      t.strign :type  # mailing_address or practice_location_address
       t.string :first_line
       t.string :second_line
       t.string :city
@@ -72,13 +72,13 @@ class CreateSchema < ActiveRecord::Migration
       t.string :country_code
       t.string :telephone_number
       t.string :fax_number
+      t.integer :npi_fk
     end
 
     # foreign keys
-    add_foreign_key :provider, :address, column: :business_mailing_address_id_fk
-    add_foreign_key :provider, :address, column: :business_practice_location_address_id_fk
     add_foreign_key :taxonomy_license, :provider, column: :npi_fk
     add_foreign_key :taxonomy_group, :provider, column: :npi_fk
     add_foreign_key :other_provider, :provider, column: :npi_fk
+    add_foreign_key :address, :provider, column: :npi_fk
   end
 end
