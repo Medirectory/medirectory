@@ -20,8 +20,6 @@ CREATE TABLE IF NOT EXISTS provider (
   provider_other_name_suffix varchar,
   provider_other_credential varchar,
   provider_other_last_name_type_code int,
-  business_mailing_address_id_fk int references address(id),
-  business_practice_location_address_id_fk int references address(id),
   provider_enumeration_date date,
   last_update_date date,
   npi_deactivation_reason_code varchar,
