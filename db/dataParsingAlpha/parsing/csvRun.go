@@ -345,8 +345,8 @@ func keyMap() map[string]int {
 		"healthcare_provider_taxonomy_group_15":                                  328,
 	}
 }
-func dbSetup() *sql.DB {
-	db, err := sql.Open("postgres", " dbname=fha sslmode=disable")
+func dbSetup(dbname string) *sql.DB {
+	db, err := sql.Open("postgres", " dbname="+dbname+" sslmode=disable")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -472,9 +472,10 @@ func createInsert(csvIndicies []string, record []string, nppesHeaders map[string
 }
 
 func main() {
+	argsWithoutProg := os.Args[1:]
 	startingTime := time.Now()
 	fmt.Println("Started parsing", startingTime)
-	csvfile, err := os.Open("<add file here>")
+	csvfile, err := os.Open(argsWithoutProg[1])
 
 	defer csvfile.Close()
 
@@ -484,7 +485,7 @@ func main() {
 	}
 	first := true
 	nppesHeaders := keyMap()
-	db := dbSetup()
+	db := dbSetup(argsWithoutProg[0])
 	err = db.Ping()
 
 	csvReader := csv.NewReader(csvfile)
@@ -575,7 +576,7 @@ func main() {
 		//durationAsInt64 := int64(duration.Seconds())
 
 		if i%50 == 0 {
-			db.Exec(output)
+			go db.Exec(output)
 			//fmt.Println("Finished parsing group ", float64(i)/float64(durationAsInt64))
 			output = ""
 			// if durationAsInt64 >= 30 {
