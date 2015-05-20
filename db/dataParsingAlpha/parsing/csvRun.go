@@ -345,11 +345,7 @@ func keyMap() map[string]int {
 		"healthcare_provider_taxonomy_group_15":                                  328,
 	}
 }
-func dbSetup(dbname string) *sql.DB {
-	db, err := sql.Open("postgres", " dbname="+dbname+" sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
+func dbSetup(db *sql.DB) {
 
 	createProvider := `CREATE TABLE IF NOT EXISTS provider (
 	  npi bigint PRIMARY KEY,
@@ -485,7 +481,12 @@ func main() {
 	}
 	first := true
 	nppesHeaders := keyMap()
-	db := dbSetup(argsWithoutProg[0])
+
+	db, err := sql.Open("postgres", " dbname="+argsWithoutProg[0]+" sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	dbSetup(db)
 	err = db.Ping()
 
 	csvReader := csv.NewReader(csvfile)
