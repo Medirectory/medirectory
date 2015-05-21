@@ -1,7 +1,7 @@
 class CreateProvider < ActiveRecord::Migration
   def change
-    create_table :providers do |t|
-      t.integer :npi
+    create_table :providers, id: false do |t|
+      t.integer :npi, primary_key:true
       t.integer :entity_type_code
       t.integer :replacement_npi
       t.string :last_name_legal_name

@@ -1,7 +1,7 @@
 class CreateOrganization < ActiveRecord::Migration
   def change
-    create_table :organizations do |t|
-      t.integer :npi
+    create_table :organizations, id: false do |t|
+      t.integer :npi, primary_key:true
       t.integer :entity_type_code
       t.integer :replacement_npi
       t.string :organization_name_legal_business_name
