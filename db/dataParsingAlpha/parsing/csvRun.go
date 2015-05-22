@@ -108,8 +108,8 @@ var addressColumns = [...]string{
 	"country_code",
 	"telephone_number",
 	"fax_number",
-	"entity_id",
-	"entity_type"}
+	"entity_type",
+	"entity_id"}
 var mailingHeaders = [...]string{"provider_first_line_business_mailing_address", "provider_second_line_business_mailing_address",
 	"provider_business_mailing_address_city_name", "provider_business_mailing_address_state_name",
 	"provider_business_mailing_address_postal_code", "provider_business_mailing_address_country_code",
@@ -143,33 +143,6 @@ var taxonomyGroupColumns = [...]string{
 	"entity_id"}
 var taxonomyGroupHeaders = [...]string{"healthcare_provider_taxonomy_group_%d"}
 
-func nullEmptyCheck(val string) string {
-	output := strings.Replace(val, "'", "''", -1)
-	if output == "" {
-		return "DEFAULT"
-	}
-	return "'" + output + "'"
-}
-func createInsert(csvIndicies []string, record []string, nppesHeaders map[string]int, reportNull bool) string {
-	output := ""
-	nonNullCount := 0
-	for index, element := range csvIndicies {
-		ending := ","
-		if index == len(csvIndicies)-1 {
-			ending = ""
-		}
-		deafultCheck := nullEmptyCheck(record[nppesHeaders[element]])
-		if deafultCheck == "DEFAULT" {
-			nonNullCount = nonNullCount + 1
-		}
-		output = output + deafultCheck + ending
-	}
-	if nonNullCount == len(csvIndicies)-1 && reportNull {
-		output = ""
-	}
-	return output
-}
-
 func underscore(string string) string {
 	parensRegexp := regexp.MustCompile(" \\(.*\\)")
 	string = parensRegexp.ReplaceAllString(string, "")
@@ -177,21 +150,27 @@ func underscore(string string) string {
 	return strings.Replace(string, " ", "_", -1)
 }
 
-func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt) {
-	var values []interface{}
-	for _, header := range headers {
-		value := recordMap[header]
-		if len(value) > 0 {
-			values = append(values, value)
-		} else {
-			values = append(values, nil)
+// notAllNull feels hacky, but should allow us to remove completely null values from the inserts
+func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt, repeat int) {
+	for i := 1; i <= repeat; i++ {
+		var values []interface{}
+		for _, header := range headers {
+			if strings.Contains(header, "%d") {
+				header = fmt.Sprintf(header, i)
+			}
+			value := recordMap[header]
+			if len(value) > 0 {
+				values = append(values, value)
+			} else {
+				values = append(values, nil)
+			}
 		}
-	}
-	values = append(values, recordMap["npi"])
-	_, err := stmt.Exec(values...)
-	if err != nil {
-		fmt.Println(values)
-		log.Fatal(err)
+		values = append(values, recordMap["npi"])
+		_, err := stmt.Exec(values...)
+		if err != nil {
+			fmt.Println(values)
+			log.Fatal(err)
+		}
 	}
 	//fmt.Println(values)
 }
@@ -199,16 +178,33 @@ func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt) {
 func insert(recordMap map[string]string, stmts map[string]*sql.Stmt) {
 	var entity_type string
 	if recordMap["entity_type_code"] == "1" {
-		insertData(providerHeaders[:], recordMap, stmts["providers"])
+		insertData(providerHeaders[:], recordMap, stmts["providers"], 1)
 		entity_type = "provider"
 	} else if recordMap["entity_type_code"] == "2" {
-		insertData(organizationHeaders[:], recordMap, stmts["organizations"])
+		insertData(organizationHeaders[:], recordMap, stmts["organizations"], 1)
 		entity_type = "organization"
 	} else if recordMap["entity_type_code"] == "" {
 	} else {
 		log.Fatal("Unknown entity type code")
 	}
 	recordMap["entity_type"] = entity_type
+	recordMap["address_type"] = "mailing"
+	mailingHeaders := append([]string{"address_type"}, mailingHeaders[:]...) //prepend address_type
+	mailingHeaders = append(mailingHeaders, "entity_type")                   // append entity_type
+	insertData(mailingHeaders[:], recordMap, stmts["addresses"], 1)
+	recordMap["address_type"] = "paractice_location"
+	practiceLocationHeaders := append([]string{"address_type"}, practiceLocationHeaders[:]...)
+	practiceLocationHeaders = append(practiceLocationHeaders, "entity_type")
+	insertData(practiceLocationHeaders[:], recordMap, stmts["addresses"], 1)
+
+	otherProviderHeaders := append(otherProviderHeaders[:], "entity_type")
+	insertData(otherProviderHeaders[:], recordMap, stmts["other_provider_identifiers"], 50)
+
+	taxonomyGroupHeaders := append(taxonomyGroupHeaders[:], "entity_type")
+	insertData(taxonomyGroupHeaders[:], recordMap, stmts["taxonomy_groups"], 15)
+
+	taxonomyLicenseHeaders := append(taxonomyLicenseHeaders[:], "entity_type")
+	insertData(taxonomyLicenseHeaders[:], recordMap, stmts["taxonomy_licenses"], 15)
 
 }
 
@@ -220,9 +216,7 @@ func prepareCopyIn(table string, columns []string, db *sql.DB) (*sql.Stmt, *sql.
 	copyIn := pq.CopyIn(table, columns...)
 	output, err := txn.Prepare(copyIn)
 	if err != nil {
-
 		fmt.Println(table)
-
 		log.Fatal(err)
 	}
 	return output, txn
