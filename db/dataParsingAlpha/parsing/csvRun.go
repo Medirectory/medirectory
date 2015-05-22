@@ -176,23 +176,23 @@ func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt, r
 }
 
 func insert(recordMap map[string]string, stmts map[string]*sql.Stmt) {
-	var entity_type string
 	if recordMap["entity_type_code"] == "1" {
 		insertData(providerHeaders[:], recordMap, stmts["providers"], 1)
-		entity_type = "provider"
+		recordMap["entity_type"] = "Provider"
 	} else if recordMap["entity_type_code"] == "2" {
 		insertData(organizationHeaders[:], recordMap, stmts["organizations"], 1)
-		entity_type = "organization"
+		recordMap["entity_type"] = "Organization"
 	} else if recordMap["entity_type_code"] == "" {
 	} else {
 		log.Fatal("Unknown entity type code")
 	}
-	recordMap["entity_type"] = entity_type
-	recordMap["address_type"] = "mailing"
+
+	recordMap["address_type"] = "MailingAddress"
 	mailingHeaders := append([]string{"address_type"}, mailingHeaders[:]...) //prepend address_type
 	mailingHeaders = append(mailingHeaders, "entity_type")                   // append entity_type
 	insertData(mailingHeaders[:], recordMap, stmts["addresses"], 1)
-	recordMap["address_type"] = "paractice_location"
+
+	recordMap["address_type"] = "PracticeLocationAddress"
 	practiceLocationHeaders := append([]string{"address_type"}, practiceLocationHeaders[:]...)
 	practiceLocationHeaders = append(practiceLocationHeaders, "entity_type")
 	insertData(practiceLocationHeaders[:], recordMap, stmts["addresses"], 1)
