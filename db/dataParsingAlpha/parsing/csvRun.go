@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"fmt"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 	"io"
 	"log"
 	"os"
@@ -13,6 +13,30 @@ import (
 	"time"
 )
 
+var providerColumns = [...]string{
+	"entity_type_code",
+	"replacement_npi",
+	"last_name_legal_name",
+	"first_name",
+	"middle_name",
+	"name_prefix",
+	"name_suffix",
+	"credential",
+	"other_last_name",
+	"other_first_name",
+	"other_middle_name",
+	"other_name_prefix",
+	"other_name_suffix",
+	"other_credential",
+	"other_last_name_type_code",
+	"enumeration_date",
+	"last_update_date",
+	"npi_deactivation_reason_code",
+	"npi_deactivation_date",
+	"npi_reactivation_date",
+	"gender_code",
+	"is_sole_proprietor",
+	"npi"}
 var providerHeaders = [...]string{"entity_type_code", "replacement_npi",
 	"provider_last_name", "provider_first_name",
 	"provider_middle_name", "provider_name_prefix",
@@ -26,33 +50,97 @@ var providerHeaders = [...]string{"entity_type_code", "replacement_npi",
 	"provider_gender_code",
 	"is_sole_proprietor"}
 
-var organizationHeaders = [...]string{"npi", "entity_type_code", "replacement_npi",
-	"employer_identification_number", "provider_organization_name",
-	"provider_other_organization_name", "provider_other_organization_name_type_code",
-	"provider_enumeration_date",
-	"last_update_date", "npi_deactivation_reason_code",
-	"npi_deactivation_date", "npi_reactivation_date", "authorized_official_last_name",
-	"authorized_official_first_name", "authorized_official_middle_name",
-	"authorized_official_name_prefix", "authorized_official_name_suffix",
+var organizationColumns = [...]string{
+	"entity_type_code",
+	"replacement_npi",
+	"ein",
+	"organization_name_legal_business_name",
+	"other_organization_name",
+	"other_organization_name_type_code",
+	"enumeration_date",
+	"last_update_date",
+	"npi_deactivation_code",
+	"npi_deactivation_date",
+	"npi_reactivation_date",
+	"authorized_official_last_name",
+	"authorized_official_first_name",
+	"authorized_official_middle_name",
+	"authorized_official_name_prefix",
+	"authorized_official_name_suffix",
 	"authorized_official_credential",
-	"authorized_official_titleor_position", "authorized_official_telephone_number",
+	"authorized_official_titleor_position",
+	"authorized_official_telephone_number",
 	"is_organization_subpart",
-	"parent_organization_lbn", "parent_organization_tin"}
+	"parent_organization_lbn",
+	"parent_organization_tin",
+	"npi"}
+var organizationHeaders = [...]string{
+	"entity_type_code",
+	"replacement_npi",
+	"employer_identification_number",
+	"provider_organization_name",
+	"provider_other_organization_name",
+	"provider_other_organization_name_type_code",
+	"provider_enumeration_date",
+	"last_update_date",
+	"npi_deactivation_reason_code",
+	"npi_deactivation_date",
+	"npi_reactivation_date",
+	"authorized_official_last_name",
+	"authorized_official_first_name",
+	"authorized_official_middle_name",
+	"authorized_official_name_prefix",
+	"authorized_official_name_suffix",
+	"authorized_official_credential",
+	"authorized_official_titleor_position",
+	"authorized_official_telephone_number",
+	"is_organization_subpart",
+	"parent_organization_lbn",
+	"parent_organization_tin"}
 
+var addressColumns = [...]string{
+	"type", // mailing_address or practice_location_address
+	"first_line",
+	"second_line",
+	"city",
+	"state",
+	"postal_code",
+	"country_code",
+	"telephone_number",
+	"fax_number",
+	"entity_id",
+	"entity_type"}
 var mailingHeaders = [...]string{"provider_first_line_business_mailing_address", "provider_second_line_business_mailing_address",
 	"provider_business_mailing_address_city_name", "provider_business_mailing_address_state_name",
 	"provider_business_mailing_address_postal_code", "provider_business_mailing_address_country_code",
 	"provider_business_mailing_address_telephone_number", "provider_business_mailing_address_fax_number"}
-
 var practiceLocationHeaders = [...]string{"provider_first_line_business_practice_location_address", "provider_second_line_business_practice_location_address",
 	"provider_business_practice_location_address_city_name", "provider_business_practice_location_address_state_name",
 	"provider_business_practice_location_address_postal_code", "provider_business_practice_location_address_country_code",
 	"provider_business_practice_location_address_telephone_number", "provider_business_practice_location_address_fax_number"}
 
+var otherProviderColumns = [...]string{
+	"identifier",
+	"identifier_type_code",
+	"identifier_state",
+	"identifier_issuer",
+	"entity_type",
+	"entity_id"}
 var otherProviderHeaders = [...]string{"other_provider_identifier_%d", "other_provider_identifier_type_code_%d", "other_provider_identifier_state_%d", "other_provider_identifier_issuer_%d"}
 
+var taxonomyLicenseColumns = [...]string{
+	"taxonomy_code",
+	"license_number",
+	"license_number_state_code",
+	"primary_taxonomy_switch",
+	"entity_type",
+	"entity_id"}
 var taxonomyLicenseHeaders = [...]string{"healthcare_provider_taxonomy_code_%d", "provider_license_number_%d", "provider_license_number_state_code_%d", "healthcare_provider_primary_taxonomy_switch_%d"}
 
+var taxonomyGroupColumns = [...]string{
+	"taxonomy_group",
+	"entity_type",
+	"entity_id"}
 var taxonomyGroupHeaders = [...]string{"healthcare_provider_taxonomy_group_%d"}
 
 func nullEmptyCheck(val string) string {
@@ -89,23 +177,55 @@ func underscore(string string) string {
 	return strings.Replace(string, " ", "_", -1)
 }
 
-func insertData(headers []string, recordMap map[string]string) {
-	var values []string
+func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt) {
+	var values []interface{}
 	for _, header := range headers {
-		values = append(values, recordMap[header])
+		value := recordMap[header]
+		if len(value) > 0 {
+			values = append(values, value)
+		} else {
+			values = append(values, nil)
+		}
 	}
-	fmt.Println(values)
+	values = append(values, recordMap["npi"])
+	_, err := stmt.Exec(values...)
+	if err != nil {
+		fmt.Println(values)
+		log.Fatal(err)
+	}
+	//fmt.Println(values)
 }
 
-func insert(recordMap map[string]string) {
+func insert(recordMap map[string]string, stmts map[string]*sql.Stmt) {
+	var entity_type string
 	if recordMap["entity_type_code"] == "1" {
-		insertData(providerHeaders[:], recordMap)
+		insertData(providerHeaders[:], recordMap, stmts["providers"])
+		entity_type = "provider"
 	} else if recordMap["entity_type_code"] == "2" {
-		insertData(organizationHeaders[:], recordMap)
+		insertData(organizationHeaders[:], recordMap, stmts["organizations"])
+		entity_type = "organization"
 	} else if recordMap["entity_type_code"] == "" {
 	} else {
 		log.Fatal("Unknown entity type code")
 	}
+	recordMap["entity_type"] = entity_type
+
+}
+
+func prepareCopyIn(table string, columns []string, db *sql.DB) (*sql.Stmt, *sql.Tx) {
+	txn, err := db.Begin()
+	if err != nil {
+		log.Fatal(err)
+	}
+	copyIn := pq.CopyIn(table, columns...)
+	output, err := txn.Prepare(copyIn)
+	if err != nil {
+
+		fmt.Println(table)
+
+		log.Fatal(err)
+	}
+	return output, txn
 }
 
 func main() {
@@ -130,6 +250,16 @@ func main() {
 		log.Fatal(err)
 	}
 
+	db, err := sql.Open("postgres", " dbname="+os.Args[1]+" sslmode=disable")
+	txns := make(map[string]*sql.Tx)
+	copyIn := make(map[string]*sql.Stmt)
+	copyIn["providers"], txns["providers"] = prepareCopyIn("providers", providerColumns[:], db)
+	copyIn["organizations"], txns["organizations"] = prepareCopyIn("organizations", organizationColumns[:], db)
+	copyIn["addresses"], txns["addresses"] = prepareCopyIn("addresses", addressColumns[:], db)
+	copyIn["other_provider_identifiers"], txns["other_provider_identifiers"] = prepareCopyIn("other_provider_identifiers", otherProviderColumns[:], db)
+	copyIn["taxonomy_licenses"], txns["taxonomy_licenses"] = prepareCopyIn("taxonomy_licenses", taxonomyLicenseColumns[:], db)
+	copyIn["taxonomy_groups"], txns["taxonomy_groups"] = prepareCopyIn("taxonomy_groups", taxonomyGroupColumns[:], db)
+
 	for {
 
 		record, err := csvReader.Read()
@@ -148,16 +278,20 @@ func main() {
 			}
 		}
 
-		insert(recordMap)
+		insert(recordMap, copyIn)
 	}
 
-	db, err := sql.Open("postgres", " dbname="+os.Args[1]+" sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
+	for _, stmt := range copyIn {
+		err = stmt.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
-	err = db.Ping()
-	if err != nil {
-		log.Fatal(err)
+	for _, txn := range txns {
+		err = txn.Commit()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	fmt.Println("Finished parsing", time.Now())
