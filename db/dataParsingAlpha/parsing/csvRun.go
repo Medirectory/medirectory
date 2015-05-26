@@ -151,7 +151,7 @@ func underscore(string string) string {
 }
 
 // notAllNull feels hacky, but should allow us to remove completely null values from the inserts
-func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt, repeat int) {
+func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt, repeat int, ensureNonNull []int) {
 	for i := 1; i <= repeat; i++ {
 		var values []interface{}
 		for _, header := range headers {
@@ -165,6 +165,20 @@ func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt, r
 				values = append(values, nil)
 			}
 		}
+		// if there should be at least one non-null in a group, check here
+		if len(ensureNonNull) > 0 {
+			oneNonNull := false
+			for nonNullEntry := range ensureNonNull {
+				if values[nonNullEntry] != nil {
+					oneNonNull = true
+					break
+				}
+			}
+			if !oneNonNull {
+				return
+			}
+		}
+
 		values = append(values, recordMap["npi"])
 		_, err := stmt.Exec(values...)
 		if err != nil {
@@ -177,12 +191,13 @@ func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt, r
 
 func insert(recordMap map[string]string, stmts map[string]*sql.Stmt) {
 	if recordMap["entity_type_code"] == "1" {
-		insertData(providerHeaders[:], recordMap, stmts["providers"], 1)
+		insertData(providerHeaders[:], recordMap, stmts["providers"], 1, []int{})
 		recordMap["entity_type"] = "Provider"
 	} else if recordMap["entity_type_code"] == "2" {
-		insertData(organizationHeaders[:], recordMap, stmts["organizations"], 1)
+		insertData(organizationHeaders[:], recordMap, stmts["organizations"], 1, []int{})
 		recordMap["entity_type"] = "Organization"
 	} else if recordMap["entity_type_code"] == "" {
+		return
 	} else {
 		log.Fatal("Unknown entity type code")
 	}
@@ -190,21 +205,21 @@ func insert(recordMap map[string]string, stmts map[string]*sql.Stmt) {
 	recordMap["address_type"] = "MailingAddress"
 	mailingHeaders := append([]string{"address_type"}, mailingHeaders[:]...) //prepend address_type
 	mailingHeaders = append(mailingHeaders, "entity_type")                   // append entity_type
-	insertData(mailingHeaders[:], recordMap, stmts["addresses"], 1)
+	insertData(mailingHeaders[:], recordMap, stmts["addresses"], 1, []int{})
 
 	recordMap["address_type"] = "PracticeLocationAddress"
 	practiceLocationHeaders := append([]string{"address_type"}, practiceLocationHeaders[:]...)
 	practiceLocationHeaders = append(practiceLocationHeaders, "entity_type")
-	insertData(practiceLocationHeaders[:], recordMap, stmts["addresses"], 1)
+	insertData(practiceLocationHeaders[:], recordMap, stmts["addresses"], 1, []int{})
 
 	otherProviderHeaders := append(otherProviderHeaders[:], "entity_type")
-	insertData(otherProviderHeaders[:], recordMap, stmts["other_provider_identifiers"], 50)
-
-	taxonomyGroupHeaders := append(taxonomyGroupHeaders[:], "entity_type")
-	insertData(taxonomyGroupHeaders[:], recordMap, stmts["taxonomy_groups"], 15)
+	insertData(otherProviderHeaders[:], recordMap, stmts["other_provider_identifiers"], 50, []int{0, 1, 2, 3})
 
 	taxonomyLicenseHeaders := append(taxonomyLicenseHeaders[:], "entity_type")
-	insertData(taxonomyLicenseHeaders[:], recordMap, stmts["taxonomy_licenses"], 15)
+	insertData(taxonomyLicenseHeaders[:], recordMap, stmts["taxonomy_licenses"], 15, []int{0, 1, 2, 3})
+
+	taxonomyGroupHeaders := append(taxonomyGroupHeaders[:], "entity_type")
+	insertData(taxonomyGroupHeaders[:], recordMap, stmts["taxonomy_groups"], 15, []int{0})
 
 }
 
@@ -287,6 +302,8 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+
+	db.Close()
 
 	fmt.Println("Finished parsing", time.Now())
 }
