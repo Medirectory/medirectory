@@ -127,6 +127,7 @@ var otherProviderColumns = [...]string{
 	"entity_type",
 	"entity_id"}
 var otherProviderHeaders = [...]string{"other_provider_identifier_%d", "other_provider_identifier_type_code_%d", "other_provider_identifier_state_%d", "other_provider_identifier_issuer_%d"}
+var otherProviderNonNullIndicies = [...]int{0, 1, 2, 3}
 
 var taxonomyLicenseColumns = [...]string{
 	"taxonomy_code",
@@ -136,12 +137,14 @@ var taxonomyLicenseColumns = [...]string{
 	"entity_type",
 	"entity_id"}
 var taxonomyLicenseHeaders = [...]string{"healthcare_provider_taxonomy_code_%d", "provider_license_number_%d", "provider_license_number_state_code_%d", "healthcare_provider_primary_taxonomy_switch_%d"}
+var taxonomyLicenseNullIndicies = [...]int{0, 1, 2, 3}
 
 var taxonomyGroupColumns = [...]string{
 	"taxonomy_group",
 	"entity_type",
 	"entity_id"}
 var taxonomyGroupHeaders = [...]string{"healthcare_provider_taxonomy_group_%d"}
+var taxonomyGroupNonNullIndicies = [...]int{0}
 
 func underscore(string string) string {
 	parensRegexp := regexp.MustCompile(" \\(.*\\)")
@@ -166,7 +169,7 @@ func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt, r
 			}
 		}
 		// if there should be at least one non-null in a group, check here
-		if len(ensureNonNull) > 0 {
+		if ensureNonNull != nil {
 			oneNonNull := false
 			for nonNullEntry := range ensureNonNull {
 				if values[nonNullEntry] != nil {
@@ -191,12 +194,13 @@ func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt, r
 
 func insert(recordMap map[string]string, stmts map[string]*sql.Stmt) {
 	if recordMap["entity_type_code"] == "1" {
-		insertData(providerHeaders[:], recordMap, stmts["providers"], 1, []int{})
+		insertData(providerHeaders[:], recordMap, stmts["providers"], 1, nil)
 		recordMap["entity_type"] = "Provider"
 	} else if recordMap["entity_type_code"] == "2" {
-		insertData(organizationHeaders[:], recordMap, stmts["organizations"], 1, []int{})
+		insertData(organizationHeaders[:], recordMap, stmts["organizations"], 1, nil)
 		recordMap["entity_type"] = "Organization"
 	} else if recordMap["entity_type_code"] == "" {
+		// simply returns on the deactivated numbers
 		return
 	} else {
 		log.Fatal("Unknown entity type code")
@@ -205,21 +209,21 @@ func insert(recordMap map[string]string, stmts map[string]*sql.Stmt) {
 	recordMap["address_type"] = "MailingAddress"
 	mailingHeaders := append([]string{"address_type"}, mailingHeaders[:]...) //prepend address_type
 	mailingHeaders = append(mailingHeaders, "entity_type")                   // append entity_type
-	insertData(mailingHeaders[:], recordMap, stmts["addresses"], 1, []int{})
+	insertData(mailingHeaders[:], recordMap, stmts["addresses"], 1, nil)
 
 	recordMap["address_type"] = "PracticeLocationAddress"
 	practiceLocationHeaders := append([]string{"address_type"}, practiceLocationHeaders[:]...)
 	practiceLocationHeaders = append(practiceLocationHeaders, "entity_type")
-	insertData(practiceLocationHeaders[:], recordMap, stmts["addresses"], 1, []int{})
+	insertData(practiceLocationHeaders[:], recordMap, stmts["addresses"], 1, nil)
 
 	otherProviderHeaders := append(otherProviderHeaders[:], "entity_type")
-	insertData(otherProviderHeaders[:], recordMap, stmts["other_provider_identifiers"], 50, []int{0, 1, 2, 3})
+	insertData(otherProviderHeaders[:], recordMap, stmts["other_provider_identifiers"], 50, otherProviderNonNullIndicies[:])
 
 	taxonomyLicenseHeaders := append(taxonomyLicenseHeaders[:], "entity_type")
-	insertData(taxonomyLicenseHeaders[:], recordMap, stmts["taxonomy_licenses"], 15, []int{0, 1, 2, 3})
+	insertData(taxonomyLicenseHeaders[:], recordMap, stmts["taxonomy_licenses"], 15, taxonomyLicenseNullIndicies[:])
 
 	taxonomyGroupHeaders := append(taxonomyGroupHeaders[:], "entity_type")
-	insertData(taxonomyGroupHeaders[:], recordMap, stmts["taxonomy_groups"], 15, []int{0})
+	insertData(taxonomyGroupHeaders[:], recordMap, stmts["taxonomy_groups"], 15, taxonomyGroupNonNullIndicies[:])
 
 }
 
@@ -291,6 +295,10 @@ func main() {
 	}
 
 	for _, stmt := range copyIn {
+		_, err = stmt.Exec() // flushes any buffered data
+		if err != nil {
+			log.Fatal(err)
+		}
 		err = stmt.Close()
 		if err != nil {
 			log.Fatal(err)
