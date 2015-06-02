@@ -1,0 +1,2 @@
+class PracticeLocationAddress < Address
+end

@@ -1,17 +1,17 @@
-DROP TABLE other_provider;
-CREATE TABLE IF NOT EXISTS other_provider (
-  other_provider_identifier varchar,
-  other_provider_identifier_type_code varchar,
-  other_provider_identifier_state varchar,
-  other_provider_identifier_issuer varchar,
+DROP TABLE IF EXISTS other_provider_identifier;
+CREATE TABLE IF NOT EXISTS other_provider_identifier (
+  identifier varchar,
+  identifier_type_code varchar,
+  identifier_state varchar,
+  identifier_issuer varchar,
   npi_fk bigint references provider(npi)
 );
 
-INSERT INTO other_provider (
-  other_provider_identifier, 
-  other_provider_identifier_type_code,
-  other_provider_identifier_state,
-  other_provider_identifier_issuer,
+INSERT INTO other_provider_identifier (
+  identifier, 
+  identifier_type_code,
+  identifier_state,
+  identifier_issuer,
   npi_fk
 )
 SELECT *

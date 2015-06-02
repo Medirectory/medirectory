@@ -1,3 +1,12 @@
+DROP TABLE IF EXISTS taxonomy_license;
+CREATE TABLE IF NOT EXISTS taxonomy_license (
+  healthcare_provider_taxonomy_code varchar,
+  provider_license_number varchar,
+  provider_license_number_state_code varchar,
+  healthcare_provider_primary_taxonomy_switch varchar,
+  npi_fk bigint references provider(npi)
+);
+
 INSERT INTO taxonomy_license (
   healthcare_provider_taxonomy_code, 
   provider_license_number, 
@@ -8,7 +17,6 @@ INSERT INTO taxonomy_license (
 SELECT * 
 FROM
 (
-
   SELECT 
     healthcare_provider_taxonomy_code_1,
     provider_license_number_1,
