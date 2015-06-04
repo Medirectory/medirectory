@@ -5,13 +5,13 @@ module Api
 
       def show
         provider = Provider.find(params[:id])
-        toInclude = [:mailing_address, :practice_location_address, :other_provider_identifiers,
+        to_include = [:mailing_address, :practice_location_address, :other_provider_identifiers,
             :taxonomy_licenses, :taxonomy_groups ]
         respond_to do |format|
           format.xml { render xml: provider, 
-            :include => toInclude}
+            :include => to_include}
           format.json { render json: provider, 
-            :include => toInclude}
+            :include => to_include}
         end
       end
 
