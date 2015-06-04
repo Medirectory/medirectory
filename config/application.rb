@@ -25,5 +25,8 @@ module Medirectory
     config.action_dispatch.default_headers = {
         'Access-Control-Allow-Origin' => '*'
     }
+
+    # Use SQL for schema to preserve indexes
+    config.active_record.schema_format = :sql
   end
 end

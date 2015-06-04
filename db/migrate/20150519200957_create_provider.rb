@@ -1,5 +1,5 @@
 class CreateProvider < ActiveRecord::Migration
-  def change
+  def up
     create_table :providers, id: false do |t|
       t.integer :npi, primary_key:true
       t.integer :entity_type_code
@@ -25,5 +25,16 @@ class CreateProvider < ActiveRecord::Migration
       t.string :gender_code
       t.string :is_sole_proprietor
     end
+    execute %{
+      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', last_name_legal_name));
+      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', first_name));
+      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', middle_name));
+      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', other_last_name));
+      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', other_first_name));
+      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', other_middle_name));
+    }
+  end
+  def down
+    drop_table :providers
   end
 end

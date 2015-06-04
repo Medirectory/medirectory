@@ -1,5 +1,5 @@
 class CreateOrganization < ActiveRecord::Migration
-  def change
+  def up
     create_table :organizations, id: false do |t|
       t.integer :npi, primary_key:true
       t.integer :entity_type_code
@@ -25,5 +25,16 @@ class CreateOrganization < ActiveRecord::Migration
       t.string :parent_organization_lbn
       t.string :parent_organization_tin
     end
+    execute %{
+      CREATE INDEX ON organizations USING GIN(TO_TSVECTOR('english', organization_name_legal_business_name));
+      CREATE INDEX ON organizations USING GIN(TO_TSVECTOR('english', other_organization_name));
+      CREATE INDEX ON organizations USING GIN(TO_TSVECTOR('english', authorized_official_last_name));
+      CREATE INDEX ON organizations USING GIN(TO_TSVECTOR('english', authorized_official_first_name));
+      CREATE INDEX ON organizations USING GIN(TO_TSVECTOR('english', authorized_official_middle_name));
+      CREATE INDEX ON organizations USING GIN(TO_TSVECTOR('english', authorized_official_telephone_number));
+    }
+  end
+  def down
+    drop_table :organizations
   end
 end
