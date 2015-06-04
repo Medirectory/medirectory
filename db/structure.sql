@@ -1,0 +1,469 @@
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: addresses; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE addresses (
+    id integer NOT NULL,
+    type character varying,
+    first_line character varying,
+    second_line character varying,
+    city character varying,
+    state character varying,
+    postal_code character varying,
+    country_code character varying,
+    telephone_number character varying,
+    fax_number character varying,
+    entity_id integer,
+    entity_type character varying
+);
+
+
+--
+-- Name: addresses_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE addresses_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: addresses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE addresses_id_seq OWNED BY addresses.id;
+
+
+--
+-- Name: organizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE organizations (
+    npi integer NOT NULL,
+    entity_type_code integer,
+    ein character varying,
+    replacement_npi integer,
+    organization_name_legal_business_name character varying,
+    other_organization_name character varying,
+    other_organization_name_type_code character varying,
+    enumeration_date date,
+    last_update_date date,
+    npi_deactivation_code character varying,
+    npi_deactivation_date date,
+    npi_reactivation_date date,
+    authorized_official_last_name character varying,
+    authorized_official_first_name character varying,
+    authorized_official_middle_name character varying,
+    authorized_official_name_prefix character varying,
+    authorized_official_name_suffix character varying,
+    authorized_official_credential character varying,
+    authorized_official_titleor_position character varying,
+    authorized_official_telephone_number character varying,
+    is_organization_subpart character varying,
+    parent_organization_lbn character varying,
+    parent_organization_tin character varying
+);
+
+
+--
+-- Name: other_provider_identifiers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE other_provider_identifiers (
+    id integer NOT NULL,
+    identifier character varying,
+    identifier_type_code character varying,
+    identifier_state character varying,
+    identifier_issuer character varying,
+    entity_id integer,
+    entity_type character varying
+);
+
+
+--
+-- Name: other_provider_identifiers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE other_provider_identifiers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: other_provider_identifiers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE other_provider_identifiers_id_seq OWNED BY other_provider_identifiers.id;
+
+
+--
+-- Name: providers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE providers (
+    npi integer NOT NULL,
+    entity_type_code integer,
+    replacement_npi integer,
+    last_name_legal_name character varying,
+    first_name character varying,
+    middle_name character varying,
+    name_prefix character varying,
+    name_suffix character varying,
+    credential character varying,
+    other_last_name character varying,
+    other_first_name character varying,
+    other_middle_name character varying,
+    other_name_prefix character varying,
+    other_name_suffix character varying,
+    other_credential character varying,
+    other_last_name_type_code integer,
+    enumeration_date date,
+    last_update_date date,
+    npi_deactivation_reason_code character varying,
+    npi_deactivation_date date,
+    npi_reactivation_date date,
+    gender_code character varying,
+    is_sole_proprietor character varying
+);
+
+
+--
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE schema_migrations (
+    version character varying NOT NULL
+);
+
+
+--
+-- Name: taxonomy_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE taxonomy_groups (
+    id integer NOT NULL,
+    taxonomy_group character varying,
+    entity_id integer,
+    entity_type character varying
+);
+
+
+--
+-- Name: taxonomy_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE taxonomy_groups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: taxonomy_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE taxonomy_groups_id_seq OWNED BY taxonomy_groups.id;
+
+
+--
+-- Name: taxonomy_licenses; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE taxonomy_licenses (
+    id integer NOT NULL,
+    taxonomy_code character varying,
+    license_number character varying,
+    license_number_state_code character varying,
+    primary_taxonomy_switch character varying,
+    entity_id integer,
+    entity_type character varying
+);
+
+
+--
+-- Name: taxonomy_licenses_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE taxonomy_licenses_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: taxonomy_licenses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE taxonomy_licenses_id_seq OWNED BY taxonomy_licenses.id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY addresses ALTER COLUMN id SET DEFAULT nextval('addresses_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY other_provider_identifiers ALTER COLUMN id SET DEFAULT nextval('other_provider_identifiers_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY taxonomy_groups ALTER COLUMN id SET DEFAULT nextval('taxonomy_groups_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY taxonomy_licenses ALTER COLUMN id SET DEFAULT nextval('taxonomy_licenses_id_seq'::regclass);
+
+
+--
+-- Name: addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY addresses
+    ADD CONSTRAINT addresses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY organizations
+    ADD CONSTRAINT organizations_pkey PRIMARY KEY (npi);
+
+
+--
+-- Name: other_provider_identifiers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY other_provider_identifiers
+    ADD CONSTRAINT other_provider_identifiers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: providers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY providers
+    ADD CONSTRAINT providers_pkey PRIMARY KEY (npi);
+
+
+--
+-- Name: taxonomy_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY taxonomy_groups
+    ADD CONSTRAINT taxonomy_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: taxonomy_licenses_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY taxonomy_licenses
+    ADD CONSTRAINT taxonomy_licenses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_addresses_on_entity_type_and_entity_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_addresses_on_entity_type_and_entity_id ON addresses USING btree (entity_type, entity_id);
+
+
+--
+-- Name: index_other_provider_identifiers_on_entity_type_and_entity_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_other_provider_identifiers_on_entity_type_and_entity_id ON other_provider_identifiers USING btree (entity_type, entity_id);
+
+
+--
+-- Name: index_taxonomy_groups_on_entity_type_and_entity_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_taxonomy_groups_on_entity_type_and_entity_id ON taxonomy_groups USING btree (entity_type, entity_id);
+
+
+--
+-- Name: index_taxonomy_licenses_on_entity_type_and_entity_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_taxonomy_licenses_on_entity_type_and_entity_id ON taxonomy_licenses USING btree (entity_type, entity_id);
+
+
+--
+-- Name: organizations_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx ON organizations USING gin (to_tsvector('english'::regconfig, (organization_name_legal_business_name)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx1 ON organizations USING gin (to_tsvector('english'::regconfig, (other_organization_name)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx2; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx2 ON organizations USING gin (to_tsvector('english'::regconfig, (authorized_official_last_name)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx3; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx3 ON organizations USING gin (to_tsvector('english'::regconfig, (authorized_official_first_name)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx4; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx4 ON organizations USING gin (to_tsvector('english'::regconfig, (authorized_official_middle_name)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx5; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx5 ON organizations USING gin (to_tsvector('english'::regconfig, (authorized_official_telephone_number)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx ON providers USING gin (to_tsvector('english'::regconfig, (last_name_legal_name)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx1 ON providers USING gin (to_tsvector('english'::regconfig, (first_name)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx2; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx2 ON providers USING gin (to_tsvector('english'::regconfig, (middle_name)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx3; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx3 ON providers USING gin (to_tsvector('english'::regconfig, (other_last_name)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx4; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx4 ON providers USING gin (to_tsvector('english'::regconfig, (other_first_name)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx5; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx5 ON providers USING gin (to_tsvector('english'::regconfig, (other_middle_name)::text));
+
+
+--
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+SET search_path TO "$user",public;
+
+INSERT INTO schema_migrations (version) VALUES ('20150519200957');
+
+INSERT INTO schema_migrations (version) VALUES ('20150519203016');
+
+INSERT INTO schema_migrations (version) VALUES ('20150519203738');
+
+INSERT INTO schema_migrations (version) VALUES ('20150519204059');
+
+INSERT INTO schema_migrations (version) VALUES ('20150519204229');
+
+INSERT INTO schema_migrations (version) VALUES ('20150520152141');
+
+INSERT INTO schema_migrations (version) VALUES ('20150604143722');
+
