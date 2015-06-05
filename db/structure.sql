@@ -188,6 +188,34 @@ CREATE TABLE schema_migrations (
 
 
 --
+-- Name: searches; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW searches AS
+ SELECT providers.npi,
+    providers.npi AS entity_id,
+    'Provider'::text AS entity_type,
+    providers.last_name_legal_name,
+    providers.first_name,
+    providers.middle_name,
+    providers.other_last_name,
+    providers.other_first_name,
+    providers.other_middle_name
+   FROM providers
+UNION
+ SELECT organizations.npi,
+    organizations.npi AS entity_id,
+    'Organization'::text AS entity_type,
+    organizations.organization_name_legal_business_name AS last_name_legal_name,
+    organizations.other_organization_name AS first_name,
+    organizations.authorized_official_last_name AS middle_name,
+    organizations.authorized_official_first_name AS other_last_name,
+    organizations.authorized_official_middle_name AS other_first_name,
+    organizations.authorized_official_telephone_number AS other_middle_name
+   FROM organizations;
+
+
+--
 -- Name: taxonomy_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -466,4 +494,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150519204229');
 INSERT INTO schema_migrations (version) VALUES ('20150520152141');
 
 INSERT INTO schema_migrations (version) VALUES ('20150604143722');
+
+INSERT INTO schema_migrations (version) VALUES ('20150605201709');
 
