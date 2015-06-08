@@ -357,6 +357,48 @@ CREATE INDEX index_taxonomy_licenses_on_entity_type_and_entity_id ON taxonomy_li
 
 
 --
+-- Name: providers_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx ON providers USING gin (to_tsvector('english'::regconfig, (last_name_legal_name)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx1 ON providers USING gin (to_tsvector('english'::regconfig, (first_name)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx2; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx2 ON providers USING gin (to_tsvector('english'::regconfig, (middle_name)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx3; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx3 ON providers USING gin (to_tsvector('english'::regconfig, (other_last_name)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx4; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx4 ON providers USING gin (to_tsvector('english'::regconfig, (other_first_name)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx5; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx5 ON providers USING gin (to_tsvector('english'::regconfig, (other_middle_name)::text));
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
