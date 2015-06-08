@@ -1,5 +1,5 @@
 class ProviderSerializer < ActiveModel::Serializer
-  attributes :npi
+  delegate :attributes, to: :object
   has_one :mailing_address, as: :entity
   has_one :practice_location_address, as: :entity
   has_many :other_provider_identifiers, as: :entity
