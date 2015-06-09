@@ -2,6 +2,8 @@ module Api
   module V1
 
     class OrganizationsController < ApplicationController
+      SERIALIZATION_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
+            :taxonomy_licenses, :taxonomy_groups ]
 
       def index
         organizations = if params[:q]
@@ -13,20 +15,18 @@ module Api
                         end
         organizations = organizations.offset(params[:offset]).limit(20)
         respond_to do |format|
-          format.xml { render xml: organizations }
-          format.json { render json: organizations }
+          format.xml { render xml: organizations, 
+            :include => SERIALIZATION_INCLUDES }
+          format.json { render json: organizations}
         end
       end
 
       def show
         organization = Organization.find(params[:id])
-        to_include = [:mailing_address, :practice_location_address, :other_provider_identifiers,
-            :taxonomy_licenses, :taxonomy_groups ]
         respond_to do |format|
           format.xml { render xml: organization, 
-            :include => to_include}
-          format.json { render json: organization, 
-            :include => to_include}
+            :include => SERIALIZATION_INCLUDES}
+          format.json { render json: organization}
         end
       end
 
