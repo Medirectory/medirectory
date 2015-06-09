@@ -357,6 +357,48 @@ CREATE INDEX index_taxonomy_licenses_on_entity_type_and_entity_id ON taxonomy_li
 
 
 --
+-- Name: organizations_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx ON organizations USING gin (to_tsvector('english'::regconfig, (organization_name_legal_business_name)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx1 ON organizations USING gin (to_tsvector('english'::regconfig, (other_organization_name)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx2; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx2 ON organizations USING gin (to_tsvector('english'::regconfig, (authorized_official_last_name)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx3; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx3 ON organizations USING gin (to_tsvector('english'::regconfig, (authorized_official_first_name)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx4; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx4 ON organizations USING gin (to_tsvector('english'::regconfig, (authorized_official_middle_name)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx5; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx5 ON organizations USING gin (to_tsvector('english'::regconfig, (authorized_official_telephone_number)::text));
+
+
+--
 -- Name: providers_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
