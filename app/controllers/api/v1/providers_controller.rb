@@ -2,7 +2,7 @@ module Api
   module V1
 
     class ProvidersController < ApplicationController
-      @@to_include = [:mailing_address, :practice_location_address, :other_provider_identifiers,
+      SERIALIZATION_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
             :taxonomy_licenses, :taxonomy_groups ]
 
       def index
@@ -16,7 +16,7 @@ module Api
         providers = providers.offset(params[:offset]).limit(20)
         respond_to do |format|
           format.xml { render xml: providers, 
-            :include => @@to_include}
+            :include => SERIALIZATION_INCLUDES}
           format.json { render json: providers}
         end
       end
@@ -25,7 +25,7 @@ module Api
         provider = Provider.find(params[:id])
         respond_to do |format|
           format.xml { render xml: provider, 
-            :include => @@to_include}
+            :include => SERIALIZATION_INCLUDES}
           format.json { render json: provider}
         end
       end
