@@ -220,6 +220,40 @@ UNION
 
 
 --
+-- Name: taxonomy_codes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE taxonomy_codes (
+    id integer NOT NULL,
+    code character varying,
+    taxonomy_type character varying,
+    classification character varying,
+    specialization character varying,
+    definition character varying,
+    notes character varying
+);
+
+
+--
+-- Name: taxonomy_codes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE taxonomy_codes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: taxonomy_codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE taxonomy_codes_id_seq OWNED BY taxonomy_codes.id;
+
+
+--
 -- Name: taxonomy_groups; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -302,6 +336,13 @@ ALTER TABLE ONLY other_provider_identifiers ALTER COLUMN id SET DEFAULT nextval(
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY taxonomy_codes ALTER COLUMN id SET DEFAULT nextval('taxonomy_codes_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY taxonomy_groups ALTER COLUMN id SET DEFAULT nextval('taxonomy_groups_id_seq'::regclass);
 
 
@@ -345,6 +386,14 @@ ALTER TABLE ONLY providers
 
 
 --
+-- Name: taxonomy_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY taxonomy_codes
+    ADD CONSTRAINT taxonomy_codes_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: taxonomy_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -372,6 +421,13 @@ CREATE INDEX index_addresses_on_entity_type_and_entity_id ON addresses USING btr
 --
 
 CREATE INDEX index_other_provider_identifiers_on_entity_type_and_entity_id ON other_provider_identifiers USING btree (entity_type, entity_id);
+
+
+--
+-- Name: index_taxonomy_codes_on_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_taxonomy_codes_on_code ON taxonomy_codes USING btree (code);
 
 
 --
@@ -444,4 +500,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150520152141');
 INSERT INTO schema_migrations (version) VALUES ('20150604143722');
 
 INSERT INTO schema_migrations (version) VALUES ('20150605201709');
+
+INSERT INTO schema_migrations (version) VALUES ('20150610004702');
 
