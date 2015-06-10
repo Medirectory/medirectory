@@ -4,7 +4,11 @@ module Api
     class TaxonomyCodesController < ApplicationController
 
       def index
-        codes = TaxonomyCode.all
+        codes = if params[:code]
+                  TaxonomyCode.where(code: params[:code])
+                else
+                  TaxonomyCode.all
+                end
         respond_to do |format|
           format.xml { render xml: codes}
           format.json { render json: codes}
