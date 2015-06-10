@@ -130,7 +130,7 @@ var otherProviderHeaders = [...]string{"other_provider_identifier_%d", "other_pr
 var otherProviderNonNullIndicies = [...]int{0, 1, 2, 3}
 
 var taxonomyLicenseColumns = [...]string{
-	"taxonomy_code",
+	"code",
 	"license_number",
 	"license_number_state_code",
 	"primary_taxonomy_switch",
