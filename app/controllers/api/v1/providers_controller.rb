@@ -7,9 +7,9 @@ module Api
 
       def index
         providers = if params[:q]
-                      Provider.basic_search(params[:q])
+                      Provider.basic_search(searchable_content: params[:q])
                     elsif params[:fuzzy_q]
-                      Provider.fuzzy_search(params[:fuzzy_q])
+                      Provider.fuzzy_search(searchable_content: params[:fuzzy_q])
                     else
                       Provider.all
                     end
@@ -25,7 +25,7 @@ module Api
         provider = Provider.find(params[:id])
         respond_to do |format|
           format.xml { render xml: provider, 
-            :include => SERIALIZATION_INCLUDES}
+            :include => SERIALIZATION_INCLUDES }
           format.json { render json: provider}
         end
       end

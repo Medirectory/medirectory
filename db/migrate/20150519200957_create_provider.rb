@@ -24,14 +24,12 @@ class CreateProvider < ActiveRecord::Migration
       t.date :npi_reactivation_date
       t.string :gender_code
       t.string :is_sole_proprietor
+      t.string :searchable_name
+      t.string :searchable_content
     end
     execute %{
-      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', last_name_legal_name));
-      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', first_name));
-      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', middle_name));
-      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', other_last_name));
-      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', other_first_name));
-      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('english', other_middle_name));
+      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('simple', searchable_name));
+      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('simple', searchable_content));
     }
   end
   def down
