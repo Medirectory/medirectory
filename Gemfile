@@ -13,8 +13,6 @@ gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.1.0'
 # See https://github.com/sstephenson/execjs#readme for more supported runtimes
 # gem 'therubyracer', platforms: :ruby
-# ActiveModelSerializer for Ember Data
-gem 'active_model_serializers'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -27,6 +25,9 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 # Full text search of postgres
 gem 'textacular'
+
+# Fast JSON
+gem 'oj'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
