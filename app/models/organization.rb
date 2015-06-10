@@ -9,4 +9,5 @@ class Organization < ActiveRecord::Base
   has_many :other_provider_identifiers, as: :entity
   has_many :taxonomy_groups, as: :entity
   has_many :taxonomy_licenses, as: :entity
+  has_many :taxonomy_codes, through: :taxonomy_licenses
 end

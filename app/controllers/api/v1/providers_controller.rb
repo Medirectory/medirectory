@@ -3,7 +3,7 @@ module Api
 
     class ProvidersController < ApplicationController
       SERIALIZATION_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
-            :taxonomy_licenses, :taxonomy_groups ]
+           {taxonomy_licenses: {include: :taxonomy_code}}, :taxonomy_groups ]
 
       def index
         providers = if params[:q]
