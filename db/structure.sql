@@ -290,7 +290,7 @@ ALTER SEQUENCE taxonomy_groups_id_seq OWNED BY taxonomy_groups.id;
 
 CREATE TABLE taxonomy_licenses (
     id integer NOT NULL,
-    taxonomy_code character varying,
+    code character varying,
     license_number character varying,
     license_number_state_code character varying,
     primary_taxonomy_switch character varying,
