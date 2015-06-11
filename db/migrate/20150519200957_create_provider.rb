@@ -25,10 +25,14 @@ class CreateProvider < ActiveRecord::Migration
       t.string :gender_code
       t.string :is_sole_proprietor
       t.string :searchable_name
+      t.string :searchable_location
+      t.string :searchable_taxonomy
       t.string :searchable_content
     end
     execute %{
       CREATE INDEX ON providers USING GIN(TO_TSVECTOR('simple', searchable_name));
+      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('simple', searchable_location));
+      CREATE INDEX ON providers USING GIN(TO_TSVECTOR('simple', searchable_taxonomy));
       CREATE INDEX ON providers USING GIN(TO_TSVECTOR('simple', searchable_content));
     }
   end
