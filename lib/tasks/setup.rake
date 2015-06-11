@@ -1,5 +1,19 @@
 namespace :medirectory do
 
+  desc 'Load taxonomy mapping'
+  task :load_taxonomy_map => :environment do
+    taxonomies = File.read(Rails.root.join('resources', 'taxonomy_codes.csv')).encode('UTF-8', 'ISO8859-1')
+    taxonomy_map = {
+      'Code' => 'code',
+      'Type' => 'taxonomy_type',
+      'Classification' => 'classification',
+      'Specialization' => 'specialization',
+      'Definition' => 'definition',
+      'Notes' => 'notes'
+    }
+    TaxonomyCode.copy_from StringIO.new(taxonomies), map: taxonomy_map
+  end
+
   desc 'Populate search-specific provider and organization columns'
   task :populate_search => :environment do
     # Concatenate all name fields and alternate name fields, but don't include the alternate name if it's the same as the primary name
