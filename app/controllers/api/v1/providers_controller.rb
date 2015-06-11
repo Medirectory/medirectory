@@ -15,6 +15,7 @@ module Api
                     else
                       Provider.all
                     end
+        providers = providers.order(:npi) # Secondary order to break search rank ties (which seem to create indeterminism)
         providers = providers.includes(LOAD_INCLUDES)
         providers = providers.offset(params[:offset]).limit(20)
         respond_to do |format|
