@@ -178,6 +178,8 @@ CREATE TABLE providers (
     gender_code character varying,
     is_sole_proprietor character varying,
     searchable_name character varying,
+    searchable_location character varying,
+    searchable_taxonomy character varying,
     searchable_content character varying
 );
 
@@ -469,7 +471,21 @@ CREATE INDEX providers_to_tsvector_idx ON providers USING gin (to_tsvector('simp
 -- Name: providers_to_tsvector_idx1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX providers_to_tsvector_idx1 ON providers USING gin (to_tsvector('simple'::regconfig, (searchable_content)::text));
+CREATE INDEX providers_to_tsvector_idx1 ON providers USING gin (to_tsvector('simple'::regconfig, (searchable_location)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx2; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx2 ON providers USING gin (to_tsvector('simple'::regconfig, (searchable_taxonomy)::text));
+
+
+--
+-- Name: providers_to_tsvector_idx3; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx3 ON providers USING gin (to_tsvector('simple'::regconfig, (searchable_content)::text));
 
 
 --

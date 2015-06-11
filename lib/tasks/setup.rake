@@ -27,14 +27,23 @@ namespace :medirectory do
                                                                   COALESCE(NULLIF(other_last_name, last_name_legal_name), ''))")
     puts "Updated name search for #{count} records"
 
+    count = Provider.update_all("searchable_location = CONCAT_WS(' ', COALESCE(addresses.city, ''),
+                                                                      SUBSTRING(COALESCE(addresses.postal_code, '') FROM 1 FOR 5))
+                                                       FROM addresses
+                                                       WHERE providers.npi = addresses.entity_id
+                                                       AND addresses.type = 'PracticeLocationAddress'")
+    puts "Updated location search for #{count} records"
+
+
+    count = Provider.update_all("searchable_taxonomy = CONCAT_WS(' ', COALESCE(taxonomy_codes.classification, ''),
+                                                                      COALESCE(taxonomy_codes.specialization, ''))
+                                                       FROM taxonomy_licenses, taxonomy_codes
+                                                       WHERE providers.npi = taxonomy_licenses.entity_id
+                                                       AND taxonomy_licenses.code = taxonomy_codes.code")
+    puts "Updated taxonomy search for #{count} records"
+
     # Also create a more generic searchable field that includes all searchable content of interest (ie npi, name, city, zip, specialty)
-    # FIXME: Still need to add specialty
-    count = Provider.update_all("searchable_content = CONCAT_WS(' ', providers.npi, providers.searchable_name,
-                                                                     COALESCE(addresses.city, ''),
-                                                                     SUBSTRING(COALESCE(addresses.postal_code, '') FROM 1 FOR 5))
-                                                      FROM addresses
-                                                      WHERE addresses.type = 'PracticeLocationAddress'
-                                                      AND addresses.entity_id = providers.npi")
+    count = Provider.update_all("searchable_content = CONCAT_WS(' ', npi, searchable_name, searchable_location, searchable_taxonomy)")
     puts "Updated full search for #{count} records"
 
 
