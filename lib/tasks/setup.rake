@@ -28,6 +28,7 @@ namespace :medirectory do
     puts "Updated name search for #{count} records"
 
     count = Provider.update_all("searchable_location = CONCAT_WS(' ', COALESCE(addresses.city, ''),
+                                                                      COALESCE(addresses.state, ''),
                                                                       SUBSTRING(COALESCE(addresses.postal_code, '') FROM 1 FOR 5))
                                                        FROM addresses
                                                        WHERE providers.npi = addresses.entity_id
