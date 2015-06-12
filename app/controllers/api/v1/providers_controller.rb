@@ -6,6 +6,7 @@ module Api
            {taxonomy_licenses: {include: :taxonomy_code}}, :taxonomy_groups ]
       LOAD_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
            {taxonomy_licenses: :taxonomy_code}, :taxonomy_groups ]
+      RESULTS_PER_PAGE = 10
 
       def index
 
@@ -41,11 +42,12 @@ module Api
         providers = providers.order(:npi)
 
         providers = providers.includes(LOAD_INCLUDES)
-        providers = providers.offset(params[:offset]).limit(20)
+        providers = providers.offset(params[:offset]).limit(RESULTS_PER_PAGE)
 
         respond_to do |format|
           format.xml { render xml: providers, include: SERIALIZATION_INCLUDES }
-          format.json { render json: MultiJson.encode(count: count, providers: providers.as_json(include: SERIALIZATION_INCLUDES)) }
+          format.json { render json: MultiJson.encode(meta: { totalResults: count, resultsPerPage: RESULTS_PER_PAGE },
+                                                      providers: providers.as_json(include: SERIALIZATION_INCLUDES))}
         end
       end
 
