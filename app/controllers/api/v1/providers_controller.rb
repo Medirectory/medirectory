@@ -8,6 +8,8 @@ module Api
            {taxonomy_licenses: :taxonomy_code}, :taxonomy_groups ]
 
       def index
+
+        # Basic search functionality
         providers = if params[:q]
                       Provider.basic_search(searchable_content: params[:q])
                     elsif params[:fuzzy_q]
@@ -15,12 +17,35 @@ module Api
                     else
                       Provider.all
                     end
-        providers = providers.order(:npi) # Secondary order to break search rank ties (which seem to create indeterminism)
+
+        # Layer advanced search parameters onto existing results
+        if params[:name]
+          providers = providers.basic_search(searchable_name: params[:name])
+        end
+        if params[:location]
+          providers = providers.basic_search(searchable_location: params[:location])
+        end
+        if params[:taxonomy]
+          providers = providers.basic_search(searchable_taxonomy: params[:taxonomy])
+        end
+        if params[:npi]
+          providers = providers.where(npi: params[:npi])
+        end
+
+        # We want to provide a total in addition to a paginated subset of the results
+        # Note: If we don't have query parameters (all results), this is quite slow; if we need this, see
+        # http://stackoverflow.com/questions/16916633/if-postgresql-count-is-always-slow-how-to-paginate-complex-queries
+        count = providers.size
+
+        # Add a secondary order to break search rank ties (which seem to create indeterminism)
+        providers = providers.order(:npi)
+
         providers = providers.includes(LOAD_INCLUDES)
         providers = providers.offset(params[:offset]).limit(20)
+
         respond_to do |format|
           format.xml { render xml: providers, include: SERIALIZATION_INCLUDES }
-          format.json { render json: MultiJson.encode(providers: providers.as_json(include: SERIALIZATION_INCLUDES)) }
+          format.json { render json: MultiJson.encode(count: count, providers: providers.as_json(include: SERIALIZATION_INCLUDES)) }
         end
       end
 
