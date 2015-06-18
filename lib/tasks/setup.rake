@@ -1,5 +1,21 @@
 namespace :medirectory do
 
+  desc 'Match providers to organizations using heuristics to populate a mapping table'
+  task :match_providers_organizations => :environment do
+    # NOTE: This approach is rather slow and not at all efficient, optimize if we do it more than occasionally
+    ycount = ncount = 0
+    start = Time.now
+    Provider.find_each do |provider|
+      if likely_organization = provider.likely_organization
+        provider.organizations << likely_organization
+        ycount += 1
+      else
+        ncount += 1
+      end
+      puts "Matches: #{ycount}  Non-matches: #{ncount}  (#{(Time.now - start).floor} seconds)" if (ycount + ncount) % 10000 == 0
+    end
+  end
+
   desc 'Load taxonomy mapping'
   task :load_taxonomy_map => :environment do
     taxonomies = File.read(Rails.root.join('resources', 'taxonomy_codes.csv')).encode('UTF-8', 'ISO8859-1')
@@ -43,8 +59,16 @@ namespace :medirectory do
                                                        AND taxonomy_licenses.code = taxonomy_codes.code")
     puts "Updated taxonomy search for #{count} records"
 
+    count = Provider.update_all("searchable_organization = CONCAT_WS(' ', COALESCE(organizations.organization_name_legal_business_name, ''),
+                                                                          COALESCE(organizations.other_organization_name, ''))
+                                                       FROM organizations_providers, organizations
+                                                       WHERE providers.npi = organizations_providers.provider_id
+                                                       AND organizations_providers.organization_id = organizations.npi")
+    puts "Updated organization search for #{count} records"
+
+
     # Also create a more generic searchable field that includes all searchable content of interest (ie npi, name, city, zip, specialty)
-    count = Provider.update_all("searchable_content = CONCAT_WS(' ', npi, searchable_name, searchable_location, searchable_taxonomy)")
+    count = Provider.update_all("searchable_content = CONCAT_WS(' ', npi, searchable_name, searchable_location, searchable_taxonomy, searchable_organization)")
     puts "Updated full search for #{count} records"
 
 

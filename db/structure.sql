@@ -116,6 +116,16 @@ CREATE TABLE organizations (
 
 
 --
+-- Name: organizations_providers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE organizations_providers (
+    organization_id integer,
+    provider_id integer
+);
+
+
+--
 -- Name: other_provider_identifiers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -180,7 +190,8 @@ CREATE TABLE providers (
     searchable_name character varying,
     searchable_location character varying,
     searchable_taxonomy character varying,
-    searchable_content character varying
+    searchable_content character varying,
+    searchable_organization character varying
 );
 
 
@@ -412,10 +423,73 @@ ALTER TABLE ONLY taxonomy_licenses
 
 
 --
+-- Name: index_addresses_on_city; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_addresses_on_city ON addresses USING btree (city);
+
+
+--
 -- Name: index_addresses_on_entity_type_and_entity_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_addresses_on_entity_type_and_entity_id ON addresses USING btree (entity_type, entity_id);
+
+
+--
+-- Name: index_addresses_on_fax_number; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_addresses_on_fax_number ON addresses USING btree (fax_number);
+
+
+--
+-- Name: index_addresses_on_first_line; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_addresses_on_first_line ON addresses USING btree (first_line);
+
+
+--
+-- Name: index_addresses_on_postal_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_addresses_on_postal_code ON addresses USING btree (postal_code);
+
+
+--
+-- Name: index_addresses_on_second_line; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_addresses_on_second_line ON addresses USING btree (second_line);
+
+
+--
+-- Name: index_addresses_on_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_addresses_on_state ON addresses USING btree (state);
+
+
+--
+-- Name: index_addresses_on_telephone_number; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_addresses_on_telephone_number ON addresses USING btree (telephone_number);
+
+
+--
+-- Name: index_organizations_providers_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organizations_providers_on_organization_id ON organizations_providers USING btree (organization_id);
+
+
+--
+-- Name: index_organizations_providers_on_provider_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_organizations_providers_on_provider_id ON organizations_providers USING btree (provider_id);
 
 
 --
@@ -489,6 +563,13 @@ CREATE INDEX providers_to_tsvector_idx3 ON providers USING gin (to_tsvector('sim
 
 
 --
+-- Name: providers_to_tsvector_idx4; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_to_tsvector_idx4 ON providers USING gin (to_tsvector('simple'::regconfig, (searchable_organization)::text));
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -518,4 +599,10 @@ INSERT INTO schema_migrations (version) VALUES ('20150604143722');
 INSERT INTO schema_migrations (version) VALUES ('20150605201709');
 
 INSERT INTO schema_migrations (version) VALUES ('20150610004702');
+
+INSERT INTO schema_migrations (version) VALUES ('20150616141206');
+
+INSERT INTO schema_migrations (version) VALUES ('20150617171010');
+
+INSERT INTO schema_migrations (version) VALUES ('20150617201209');
 

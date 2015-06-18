@@ -3,9 +3,9 @@ module Api
 
     class OrganizationsController < ApplicationController
       SERIALIZATION_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
-           {taxonomy_licenses: {include: :taxonomy_code}}, :taxonomy_groups ]
+           {taxonomy_licenses: {include: :taxonomy_code}}, :taxonomy_groups, :providers ]
       LOAD_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
-           {taxonomy_licenses: :taxonomy_code}, :taxonomy_groups ]
+           {taxonomy_licenses: :taxonomy_code}, :taxonomy_groups, :providers ]
 
       def index
         organizations = if params[:q]
