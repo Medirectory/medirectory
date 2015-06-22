@@ -25,7 +25,7 @@ module Api
           organizations = organizations.basic_search(searchable_name: params[:name])
         end
         if params[:authorized_official]
-          organizations = organizations.basic_search(searchable_authorized_official: params[:name])
+          organizations = organizations.basic_search(searchable_authorized_official: params[:authorized_official])
         end
         if params[:location]
           organizations = organizations.basic_search(searchable_location: params[:location])
