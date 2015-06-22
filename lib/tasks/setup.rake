@@ -51,7 +51,6 @@ namespace :medirectory do
                                                        AND addresses.type = 'PracticeLocationAddress'")
     puts "Updated location search for #{count} records"
 
-
     count = Provider.update_all("searchable_taxonomy = CONCAT_WS(' ', COALESCE(taxonomy_codes.classification, ''),
                                                                       COALESCE(taxonomy_codes.specialization, ''))
                                                        FROM taxonomy_licenses, taxonomy_codes
@@ -61,9 +60,9 @@ namespace :medirectory do
 
     count = Provider.update_all("searchable_organization = CONCAT_WS(' ', COALESCE(organizations.organization_name_legal_business_name, ''),
                                                                           COALESCE(organizations.other_organization_name, ''))
-                                                       FROM organizations_providers, organizations
-                                                       WHERE providers.npi = organizations_providers.provider_id
-                                                       AND organizations_providers.organization_id = organizations.npi")
+                                                           FROM organizations_providers, organizations
+                                                           WHERE providers.npi = organizations_providers.provider_id
+                                                           AND organizations_providers.organization_id = organizations.npi")
     puts "Updated organization search for #{count} records"
 
 
@@ -79,7 +78,28 @@ namespace :medirectory do
                                      searchable_authorized_official = CONCAT_WS(' ', COALESCE(authorized_official_first_name, ''),
                                                                                      COALESCE(authorized_official_middle_name, ''),
                                                                                      COALESCE(authorized_official_last_name, ''))")
-    puts "Updated #{count} records"
+    puts "Updated name and official search for #{count} records"
+
+    count = Organization.update_all("searchable_location = CONCAT_WS(' ', COALESCE(addresses.city, ''),
+                                                                          COALESCE(addresses.state, ''),
+                                                                          SUBSTRING(COALESCE(addresses.postal_code, '') FROM 1 FOR 5))
+                                                           FROM addresses
+                                                           WHERE organizations.npi = addresses.entity_id
+                                                           AND addresses.type = 'PracticeLocationAddress'")
+    puts "Updated location search for #{count} records"
+
+
+    count = Organization.update_all("searchable_taxonomy = CONCAT_WS(' ', COALESCE(taxonomy_codes.classification, ''),
+                                                                          COALESCE(taxonomy_codes.specialization, ''))
+                                                           FROM taxonomy_licenses, taxonomy_codes
+                                                           WHERE organizations.npi = taxonomy_licenses.entity_id
+                                                           AND taxonomy_licenses.code = taxonomy_codes.code")
+    puts "Updated taxonomy search for #{count} records"
+
+    # Also create a more generic searchable field that includes all searchable content of interest (ie npi, name, city, zip, specialty)
+    # Note: We don't include the authorized official name in this content
+    count = Organization.update_all("searchable_content = CONCAT_WS(' ', npi, searchable_name, searchable_location, searchable_taxonomy)")
+    puts "Updated full search for #{count} records"
 
   end
 

@@ -111,7 +111,10 @@ CREATE TABLE organizations (
     parent_organization_lbn character varying,
     parent_organization_tin character varying,
     searchable_name character varying,
-    searchable_authorized_official character varying
+    searchable_authorized_official character varying,
+    searchable_location character varying,
+    searchable_taxonomy character varying,
+    searchable_content character varying
 );
 
 
@@ -535,6 +538,27 @@ CREATE INDEX organizations_to_tsvector_idx1 ON organizations USING gin (to_tsvec
 
 
 --
+-- Name: organizations_to_tsvector_idx2; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx2 ON organizations USING gin (to_tsvector('simple'::regconfig, (searchable_location)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx3; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx3 ON organizations USING gin (to_tsvector('simple'::regconfig, (searchable_taxonomy)::text));
+
+
+--
+-- Name: organizations_to_tsvector_idx4; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx4 ON organizations USING gin (to_tsvector('simple'::regconfig, (searchable_content)::text));
+
+
+--
 -- Name: providers_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -605,4 +629,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150616141206');
 INSERT INTO schema_migrations (version) VALUES ('20150617171010');
 
 INSERT INTO schema_migrations (version) VALUES ('20150617201209');
+
+INSERT INTO schema_migrations (version) VALUES ('20150622153049');
 
