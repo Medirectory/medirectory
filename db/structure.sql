@@ -114,7 +114,8 @@ CREATE TABLE organizations (
     searchable_authorized_official character varying,
     searchable_location character varying,
     searchable_taxonomy character varying,
-    searchable_content character varying
+    searchable_content character varying,
+    searchable_providers character varying
 );
 
 
@@ -559,6 +560,13 @@ CREATE INDEX organizations_to_tsvector_idx4 ON organizations USING gin (to_tsvec
 
 
 --
+-- Name: organizations_to_tsvector_idx5; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_to_tsvector_idx5 ON organizations USING gin (to_tsvector('simple'::regconfig, (searchable_providers)::text));
+
+
+--
 -- Name: providers_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -631,4 +639,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150617171010');
 INSERT INTO schema_migrations (version) VALUES ('20150617201209');
 
 INSERT INTO schema_migrations (version) VALUES ('20150622153049');
+
+INSERT INTO schema_migrations (version) VALUES ('20150623194217');
 

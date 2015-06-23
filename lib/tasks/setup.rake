@@ -51,18 +51,20 @@ namespace :medirectory do
                                                        AND addresses.type = 'PracticeLocationAddress'")
     puts "Updated location search for #{count} records"
 
-    count = Provider.update_all("searchable_taxonomy = CONCAT_WS(' ', COALESCE(taxonomy_codes.classification, ''),
-                                                                      COALESCE(taxonomy_codes.specialization, ''))
-                                                       FROM taxonomy_licenses, taxonomy_codes
-                                                       WHERE providers.npi = taxonomy_licenses.entity_id
-                                                       AND taxonomy_licenses.code = taxonomy_codes.code")
+    count = Provider.update_all("searchable_taxonomy = ARRAY_TO_STRING(ARRAY(SELECT CONCAT_WS(' ', COALESCE(taxonomy_codes.classification, ''),
+                                                                                                   COALESCE(taxonomy_codes.specialization, ''))
+                                                                             FROM taxonomy_licenses, taxonomy_codes
+                                                                             WHERE providers.npi = taxonomy_licenses.entity_id
+                                                                             AND taxonomy_licenses.code = taxonomy_codes.code),
+                                                                       ' ')")
     puts "Updated taxonomy search for #{count} records"
 
-    count = Provider.update_all("searchable_organization = CONCAT_WS(' ', COALESCE(organizations.organization_name_legal_business_name, ''),
-                                                                          COALESCE(organizations.other_organization_name, ''))
-                                                           FROM organizations_providers, organizations
-                                                           WHERE providers.npi = organizations_providers.provider_id
-                                                           AND organizations_providers.organization_id = organizations.npi")
+    count = Provider.update_all("searchable_organization = ARRAY_TO_STRING(ARRAY(SELECT CONCAT_WS(' ', COALESCE(organizations.organization_name_legal_business_name, ''),
+                                                                                                       COALESCE(organizations.other_organization_name, ''))
+                                                                                 FROM organizations_providers, organizations
+                                                                                 WHERE providers.npi = organizations_providers.provider_id
+                                                                                 AND organizations_providers.organization_id = organizations.npi),
+                                                                           ' ')")
     puts "Updated organization search for #{count} records"
 
 
@@ -88,13 +90,23 @@ namespace :medirectory do
                                                            AND addresses.type = 'PracticeLocationAddress'")
     puts "Updated location search for #{count} records"
 
-
-    count = Organization.update_all("searchable_taxonomy = CONCAT_WS(' ', COALESCE(taxonomy_codes.classification, ''),
-                                                                          COALESCE(taxonomy_codes.specialization, ''))
-                                                           FROM taxonomy_licenses, taxonomy_codes
-                                                           WHERE organizations.npi = taxonomy_licenses.entity_id
-                                                           AND taxonomy_licenses.code = taxonomy_codes.code")
+    count = Organization.update_all("searchable_taxonomy = ARRAY_TO_STRING(ARRAY(SELECT CONCAT_WS(' ', COALESCE(taxonomy_codes.classification, ''),
+                                                                                                       COALESCE(taxonomy_codes.specialization, ''))
+                                                                                 FROM taxonomy_licenses, taxonomy_codes
+                                                                                 WHERE organizations.npi = taxonomy_licenses.entity_id
+                                                                                 AND taxonomy_licenses.code = taxonomy_codes.code),
+                                                                           ' ')")
     puts "Updated taxonomy search for #{count} records"
+
+
+    count = Organization.update_all("searchable_providers = ARRAY_TO_STRING(ARRAY(SELECT providers.searchable_name
+                                                                                  FROM organizations_providers, providers
+                                                                                  WHERE organizations.npi = organizations_providers.organization_id
+                                                                                  AND organizations_providers.provider_id = providers.npi),
+                                                                            ' ')")
+    puts "Updated providers search for #{count} records"
+
+
 
     # Also create a more generic searchable field that includes all searchable content of interest (ie npi, name, city, zip, specialty)
     # Note: We don't include the authorized official name in this content
@@ -103,4 +115,4 @@ namespace :medirectory do
 
   end
 
-end  
+end
