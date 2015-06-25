@@ -33,6 +33,9 @@ module Api
         if params[:taxonomy]
           organizations = organizations.basic_search(searchable_taxonomy: params[:taxonomy])
         end
+        if params[:provider]
+          organizations = organizations.basic_search(searchable_providers: params[:provider])
+        end
         if params[:npi]
           organizations = organizations.where(npi: params[:npi])
         end
