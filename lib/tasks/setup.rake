@@ -55,6 +55,7 @@ namespace :medirectory do
                                                                                                    COALESCE(taxonomy_codes.specialization, ''))
                                                                              FROM taxonomy_licenses, taxonomy_codes
                                                                              WHERE providers.npi = taxonomy_licenses.entity_id
+                                                                             AND taxonomy_licenses.entity_type = 'Provider'
                                                                              AND taxonomy_licenses.code = taxonomy_codes.code),
                                                                        ' ')")
     puts "Updated taxonomy search for #{count} records"
@@ -94,6 +95,7 @@ namespace :medirectory do
                                                                                                        COALESCE(taxonomy_codes.specialization, ''))
                                                                                  FROM taxonomy_licenses, taxonomy_codes
                                                                                  WHERE organizations.npi = taxonomy_licenses.entity_id
+                                                                                 AND taxonomy_licenses.entity_type = 'Organization'
                                                                                  AND taxonomy_licenses.code = taxonomy_codes.code),
                                                                            ' ')")
     puts "Updated taxonomy search for #{count} records"
