@@ -13,9 +13,9 @@ module Api
       def index
         # Basic search functionality
         organizations = if params[:q]
-                          Organization.basic_search(searchable_name: params[:q])
+                          Organization.basic_search(searchable_content: params[:q])
                         elsif params[:fuzzy_q]
-                          Organization.fuzzy_search(searchable_name: params[:fuzzy_q])
+                          Organization.fuzzy_search(searchable_content: params[:fuzzy_q])
                         else
                           Organization.all
                         end
