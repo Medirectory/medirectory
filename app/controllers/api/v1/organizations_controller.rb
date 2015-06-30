@@ -44,7 +44,7 @@ module Api
         count = organizations.size
 
         organizations = organizations.includes(LOAD_INCLUDES)
-        organizations = organizations.offset(params[:offset]).limit(20)
+        organizations = organizations.offset(params[:offset]).limit(RESULTS_PER_PAGE)
 
         respond_to do |format|
           format.xml { render xml: organizations, include: SERIALIZATION_INCLUDES }
