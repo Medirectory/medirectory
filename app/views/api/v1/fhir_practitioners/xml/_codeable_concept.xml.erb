@@ -1,5 +1,5 @@
 <% for coding in codings %>
-  <%= render partial: "coding.xml.erb", 
+  <%= render partial: "api/v1/fhir_practitioners/xml/coding.xml.erb", 
   locals: { 
     uri: coding[:uri],
     version: coding[:version],

@@ -52,10 +52,10 @@ class Api::V1::FhirPractitionersController < ApplicationController
   end
 
   def show
-    provider = Provider.includes(LOAD_INCLUDES).find(params[:id])
+    @provider = Provider.includes(LOAD_INCLUDES).find(params[:id])
     respond_to do |format|
-      format.xml {render :partial => "api/v1/fhir_practitioners/show.xml.erb", locals: { provider: provider} }
-      format.json { render json: MultiJson.encode(provider: provider.as_json(include: SERIALIZATION_INCLUDES))  }
+      format.xml {render "api/v1/fhir_practitioners/show.xml.erb" }
+      format.json { render "api/v1/fhir_practitioners/show.json.jbuilder" }
     end
   end
 end
