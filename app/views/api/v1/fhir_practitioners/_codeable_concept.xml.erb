@@ -1,0 +1,14 @@
+<% for coding in codings %>
+  <%= render partial: "coding.xml.erb", 
+  locals: { 
+    uri: coding[:uri],
+    version: coding[:version],
+    code: coding[:code],
+    display: coding[:display],
+    primary: coding[:primary],
+    valueSet: coding[:valueSet]
+  } %>
+<% end %>
+<% if text %>
+  <text value="<%= text %>"
+<% end %>

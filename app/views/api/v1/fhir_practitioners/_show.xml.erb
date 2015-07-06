@@ -1,0 +1,64 @@
+<Practitioner xmlns="http://hl7.org/fhir">
+  <identifier>
+    <use value="official"/>
+    <label value="NPI"/>
+    <system value="https://nppes.cms.hhs.gov/NPPES/"/>
+    <value value="<%= provider.npi %>"/>
+  </identifier>
+  <name>
+    <use value="official"/>
+    <text value="<%= provider.name_prefix.to_s + (provider.name_prefix.to_s.blank? ?  "": " ") + provider.first_name.to_s+ " " + provider.middle_name.to_s + (provider.middle_name.to_s.blank? ?  "": " ") + provider.last_name_legal_name.to_s + (provider.name_suffix.to_s.blank? ?  "": " ") + provider.name_suffix.to_s %>"/>
+    <family value="<%= provider.last_name_legal_name.to_s %>"/>
+    <given value="<%= provider.first_name.to_s + (provider.middle_name.to_s.blank? ?  "": " ") + provider.middle_name.to_s %>"/>
+    <% if not provider.name_prefix.to_s.blank? %>
+      <prefix value="<%= provider.name_prefix.to_s %>"/>
+    <% end %>
+    <% if not provider.name_suffix.to_s.blank? %>
+      <suffix value="<%= provider.name_suffix.to_s %>"/>
+    <% end %>
+  </name>
+
+  <% if provider.mailing_address.telephone_number %>
+  <%= render partial: "telecom.xml.erb", locals: { type: "phone", number: provider.mailing_address.telephone_number }%>
+  <% end %>
+  <% if provider.mailing_address.fax_number %>
+    <%= render partial: "telecom.xml.erb", locals: { type: "fax", number: provider.mailing_address.fax_number }%>
+  <% end %>
+  <% if provider.practice_location_address.telephone_number %>
+    <%= render partial: "telecom.xml.erb", locals: { type: "phone", number: provider.practice_location_address.telephone_number }%>
+  <% end %>
+  <% if provider.practice_location_address.fax_number %>
+    <%= render partial: "telecom.xml.erb", locals: { type: "fax", number: provider.practice_location_address.fax_number }%>
+  <% end %>
+
+  <%= render partial: "address.xml.erb", locals: { address: provider.mailing_address }%>
+  <%= render partial: "address.xml.erb", locals: { address: provider.practice_location_address }%>
+  
+  <gender>
+    <coding>
+      <code value="<%= provider.gender_code %>"/>
+      <display value="<%= provider.gender_code %>"/>
+    </coding>
+  </gender>
+  <!-- <photo>0..* Attachment Image of the person</photo> -->
+  <organization>
+    <% if provider.organizations.first %>
+      <%= render partial: "resource.xml.erb", locals: { reference: "", display: (provider.organizations.first.other_organization_name ?  provider.organizations.first.other_organization_name : provider.organizations.first.organization_name_legal_business_name)}%>
+    <% end %>
+  </organization>
+  <!-- <role>0..* CodeableConcept Roles which this practitioner may perform §</role> -->
+  <specialty><!-- 0..* CodeableConcept Specific specialty of the practitioner § -->
+    <% for license in provider.taxonomy_licenses %>
+      <%= render partial: "codeable_concept.xml.erb", locals: { 
+        codings: [{code:license.license_number, display: license.taxonomy_code.classification.to_s + " (" + license.taxonomy_code.specialization.to_s + ")"}],
+        text: nil
+      }%>
+    <% end %>
+  </specialty>
+  <% if provider.npi_reactivation_date %>
+    <%= render partial: "period.xml.erb", locals: { startDate: provider.npi_reactivation_date, endDate: nil}%>
+  <% else %>
+    <%= render partial: "period.xml.erb", locals: { startDate: provider.enumeration_date, endDate: provider.npi_deactivation_date}%>
+  <% end %>
+  <!-- <communication>0..* CodeableConcept A language the practitioner is able to use in patient communication</communication> -->
+</Practitioner>

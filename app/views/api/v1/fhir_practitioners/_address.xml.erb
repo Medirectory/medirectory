@@ -1,0 +1,9 @@
+<address>
+  <use value="work"/>
+  <text value="<%= address.first_line.to_s+ (address.second_line.to_s.blank? ?  "": ", ") + address.second_line.to_s + ", " + address.city.to_s + ", " + address.state.to_s + ", " + address.postal_code.to_s + ", " + address.country_code.to_s %>"/>
+  <line value="<%= address.first_line.to_s+ (address.second_line.to_s.blank? ?  "": ", ") + address.second_line.to_s %>"/>
+  <city value="<%= address.city %>"/>
+  <state value="<%= address.state %>"/>
+  <zip value="<%= address.postal_code %>"/>
+  <country value="<%= address.country_code %>"/>
+</address>
