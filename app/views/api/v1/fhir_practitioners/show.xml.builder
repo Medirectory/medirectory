@@ -1,0 +1,1 @@
+xml << render(:partial => 'api/v1/fhir_practitioners/xml/practitioner.xml.builder', locals: { provider: @provider })

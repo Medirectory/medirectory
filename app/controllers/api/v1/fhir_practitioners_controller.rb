@@ -54,7 +54,7 @@ class Api::V1::FhirPractitionersController < ApplicationController
   def show
     @provider = Provider.includes(LOAD_INCLUDES).find(params[:id])
     respond_to do |format|
-      format.xml {render "api/v1/fhir_practitioners/show.xml.erb" }
+      format.xml {render "api/v1/fhir_practitioners/show.xml.builder" }
       format.json { render "api/v1/fhir_practitioners/show.json.jbuilder" }
     end
   end
