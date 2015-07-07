@@ -24,7 +24,7 @@ json.telecom [{ system: "phone", number: provider.mailing_address.telephone_numb
   { system: "fax", number: provider.mailing_address.fax_number },
   { system: "phone", number: provider.practice_location_address.telephone_number },
   { system: "fax", number: provider.practice_location_address.fax_number }] do |locals|
-  json.partial! 'api/v1/fhir_practitioners/json/telecom.json.jbuilder', locals: locals
+  json.partial! 'api/v1/fhir_practitioners/json/contact.json.jbuilder', locals: locals
 end
 
 json.address [provider.mailing_address, provider.practice_location_address] do |address|
@@ -45,6 +45,7 @@ json.specialty provider.taxonomy_licenses do |license|
   json.partial! 'api/v1/fhir_practitioners/json/codeable_concept.json.jbuilder', 
     locals: {codings: [{code:license.license_number, display: license.taxonomy_code.classification.to_s + " (" + license.taxonomy_code.specialization.to_s + ")"}], text: nil}
 end
+
 json.period do
   if provider.npi_reactivation_date
     json.partial! 'api/v1/fhir_practitioners/json/period.json.jbuilder', 
