@@ -27,8 +27,8 @@ json.telecom [{ system: "phone", number: provider.mailing_address.telephone_numb
   json.partial! 'api/v1/fhir_practitioners/json/contact.json.jbuilder', locals: locals
 end
 
-json.address [provider.mailing_address, provider.practice_location_address] do |address|
-  json.partial! 'api/v1/fhir_practitioners/json/address.json.jbuilder', locals: { address: address}
+json.address do
+  json.partial! 'api/v1/fhir_practitioners/json/address.json.jbuilder', locals: { address: provider.practice_location_address}
 end
 
 json.gender do

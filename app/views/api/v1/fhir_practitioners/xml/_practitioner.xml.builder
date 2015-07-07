@@ -26,10 +26,8 @@ xml.Practitioner(xmlns:"http://hl7.org/fhir") do
     end
   end
 
-  [provider.mailing_address, provider.practice_location_address].each do |address|
-    xml.address do
-      xml << render(partial: 'api/v1/fhir_practitioners/xml/address.xml.builder', locals: {address: address})
-    end
+  xml.address do
+    xml << render(partial: 'api/v1/fhir_practitioners/xml/address.xml.builder', locals: {address: provider.practice_location_address})
   end
 
   xml.gender do
