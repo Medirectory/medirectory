@@ -29,6 +29,9 @@ gem 'textacular'
 # Fast JSON
 gem 'oj'
 
+# SOAP
+gem 'wash_out'
+
 # Copy CSV into DB
 gem 'postgres-copy'
 
