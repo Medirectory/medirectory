@@ -43,11 +43,10 @@ class Api::V1::FhirPractitionersController < ApplicationController
 
     providers = providers.includes(LOAD_INCLUDES)
     providers = providers.offset(params[:offset]).limit(RESULTS_PER_PAGE)
-
+    @providers = providers
     respond_to do |format|
-      format.xml { render xml: providers, include: SERIALIZATION_INCLUDES }
-      format.json { render json: MultiJson.encode(meta: { totalResults: count, resultsPerPage: RESULTS_PER_PAGE },
-                                                  providers: providers.as_json(include: SERIALIZATION_INCLUDES))}
+      format.xml { render "api/v1/fhir_practitioners/index.xml.builder" }
+      format.json { render "api/v1/fhir_practitioners/index.json.jbuilder" }
     end
   end
 
