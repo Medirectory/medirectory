@@ -12,7 +12,7 @@ module Api
 
         # Basic search functionality
         providers = if params[:q]
-                      Provider.basic_search(searchable_content: params[:q])
+                      Provider.complex_search(searchable_content: params[:q])
                     elsif params[:fuzzy_q]
                       Provider.fuzzy_search(searchable_content: params[:fuzzy_q])
                     else
@@ -21,16 +21,16 @@ module Api
 
         # Layer advanced search parameters onto existing results
         if params[:name]
-          providers = providers.basic_search(searchable_name: params[:name])
+          providers = providers.complex_search(searchable_name: params[:name])
         end
         if params[:location]
-          providers = providers.basic_search(searchable_location: params[:location])
+          providers = providers.complex_search(searchable_location: params[:location])
         end
         if params[:taxonomy]
-          providers = providers.basic_search(searchable_taxonomy: params[:taxonomy])
+          providers = providers.complex_search(searchable_taxonomy: params[:taxonomy])
         end
         if params[:organization]
-          providers = providers.basic_search(searchable_organization: params[:organization])
+          providers = providers.complex_search(searchable_organization: params[:organization])
         end
         if params[:npi]
           providers = providers.where(npi: params[:npi])
@@ -52,6 +52,15 @@ module Api
           format.json { render json: MultiJson.encode(meta: { totalResults: count, resultsPerPage: RESULTS_PER_PAGE },
                                                       providers: providers.as_json(include: SERIALIZATION_INCLUDES))}
         end
+
+      rescue ActiveRecord::StatementInvalid
+
+        # We wind up here if the search query is invalid, return a 400 error code (Bad Request)
+        respond_to do |format|
+          format.xml { render status: :bad_request, xml: { error: 'Invalid Query Syntax' } }
+          format.json { render status: :bad_request, json: { error: 'Invalid Query Syntax' } }
+        end
+
       end
 
       def show
