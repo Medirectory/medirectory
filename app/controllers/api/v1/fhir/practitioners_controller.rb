@@ -1,7 +1,7 @@
 module Api
   module V1
     module Fhir
-      class Api::V1::Fhir::PractitionersController < ApplicationController
+      class PractitionersController < ApplicationController
         SERIALIZATION_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
              {taxonomy_licenses: {include: :taxonomy_code}}, :taxonomy_groups, :organizations ]
         LOAD_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,

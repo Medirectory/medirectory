@@ -6,6 +6,7 @@ Rails.application.routes.draw do
       resources :organizations, only: [:index, :show]
       resources :taxonomies, only: :index
       namespace :fhir do
+        resources :metadata, only: [:index]
         resources :practitioners, only: [:index, :show]
       end
     end
