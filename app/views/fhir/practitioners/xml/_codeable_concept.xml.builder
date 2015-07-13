@@ -1,6 +1,6 @@
 codings.each do |coding|
   xml.coding do
-    xml << render(partial: "api/v1/fhir/practitioners/xml/coding.xml.builder", 
+    xml << render(partial: "fhir/practitioners/xml/coding.xml.builder", 
     locals: { 
       uri: coding[:uri],
       version: coding[:version],

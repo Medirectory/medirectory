@@ -1,5 +1,5 @@
 json.coding codings do |coding|
-  json.partial! "api/v1/fhir/practitioners/json/coding.json.jbuilder", 
+  json.partial! "fhir/practitioners/json/coding.json.jbuilder", 
   locals: { 
     uri: coding[:uri],
     version: coding[:version],
