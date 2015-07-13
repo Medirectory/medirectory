@@ -3,7 +3,10 @@ module Api
     module Fhir
       class MetadataController < ApplicationController
         def index
-          render "api/v1/fhir/conformance/index.xml"
+          respond_to do |format|
+            format.xml { render "api/v1/fhir/conformance/index.xml" }
+            format.json { render "api/v1/fhir/conformance/index.json" }
+          end
         end
       end
     end
