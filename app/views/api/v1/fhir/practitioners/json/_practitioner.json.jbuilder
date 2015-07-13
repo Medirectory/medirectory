@@ -24,7 +24,7 @@ json.telecom [{ system: "phone", number: provider.mailing_address.telephone_numb
   { system: "fax", number: provider.mailing_address.fax_number },
   { system: "phone", number: provider.practice_location_address.telephone_number },
   { system: "fax", number: provider.practice_location_address.fax_number }] do |locals|
-  json.partial! 'api/v1/fhir/practitioners/json/contact.json.jbuilder', locals: locals
+  json.partial! 'api/v1/fhir/practitioners/json/contact.json.jbuilder', locals: locals unless locals[:number].blank?
 end
 
 json.address do
@@ -42,8 +42,9 @@ json.organization do
 end if provider.organizations.first
 
 json.specialty provider.taxonomy_licenses do |license|
+  specialization = " (" + license.taxonomy_code.specialization.to_s + ")" unless license.taxonomy_code.specialization.to_s.blank?
   json.partial! 'api/v1/fhir/practitioners/json/codeable_concept.json.jbuilder', 
-    locals: {codings: [{code:license.license_number, display: license.taxonomy_code.classification.to_s + " (" + license.taxonomy_code.specialization.to_s + ")"}], text: nil}
+    locals: {codings: [{code:license.license_number, display: license.taxonomy_code.classification.to_s + specialization.to_s}], text: nil}
 end
 
 json.period do

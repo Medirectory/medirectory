@@ -47,16 +47,16 @@ module Api
           providers = providers.offset(params[:offset]).limit(RESULTS_PER_PAGE)
           @providers = providers
           respond_to do |format|
-            format.xml { render "api/v1/fhir/practitioners/index.xml.builder" }
-            format.json { render "api/v1/fhir/practitioners/index.json.jbuilder" }
+            format.xml { render "api/v1/fhir/practitioners/index.xml" }
+            format.json { render "api/v1/fhir/practitioners/index.json" }
           end
         end
 
         def show
           @provider = Provider.includes(LOAD_INCLUDES).find(params[:id])
           respond_to do |format|
-            format.xml {render "api/v1/fhir/practitioners/show.xml.builder" }
-            format.json { render "api/v1/fhir/practitioners/show.json.jbuilder" }
+            format.xml {render "api/v1/fhir/practitioners/show.xml" }
+            format.json { render "api/v1/fhir/practitioners/show.json" }
           end
         end
       end

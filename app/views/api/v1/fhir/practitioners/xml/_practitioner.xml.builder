@@ -22,8 +22,8 @@ xml.Practitioner(xmlns:"http://hl7.org/fhir") do
     { system: "phone", number: provider.practice_location_address.telephone_number, period: nil },
     { system: "fax", number: provider.practice_location_address.fax_number, period: nil }].each do |locals|
     xml.telecom do
-      xml << render(partial: 'api/v1/fhir/practitioners/xml/contact.xml.builder', locals: locals)
-    end
+      xml << render(partial: 'api/v1/fhir/practitioners/xml/contact.xml.builder', locals: locals) 
+    end unless locals[:number].blank?
   end
 
   xml.address do
@@ -42,8 +42,9 @@ xml.Practitioner(xmlns:"http://hl7.org/fhir") do
 
   provider.taxonomy_licenses.each do |license|
     xml.specialty do
+      specialization = " (" + license.taxonomy_code.specialization.to_s + ")" unless license.taxonomy_code.specialization.to_s.blank?
       xml << render(partial: 'api/v1/fhir/practitioners/xml/codeable_concept.xml.builder', 
-        locals: {codings: [{code:license.license_number, display: license.taxonomy_code.classification.to_s + " (" + license.taxonomy_code.specialization.to_s + ")"}], text: nil})
+        locals: {codings: [{code:license.license_number, display: license.taxonomy_code.classification.to_s + specialization.to_s}], text: nil})
     end
   end
 
