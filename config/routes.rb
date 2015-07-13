@@ -9,8 +9,8 @@ Rails.application.routes.draw do
   end
 
   namespace :fhir do
-    resources :metadata, only: [:index]
-    resources :practitioners, only: [:index, :show]
+    resources :metadata, only: [:index], defaults: { format: "xml" }
+    resources :practitioners, only: [:index, :show], defaults: { format: "xml" }
   end
 
 end
