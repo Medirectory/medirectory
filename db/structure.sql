@@ -59,7 +59,9 @@ CREATE TABLE addresses (
     telephone_number character varying,
     fax_number character varying,
     entity_id integer,
-    entity_type character varying
+    entity_type character varying,
+    latitude numeric(15,10) DEFAULT 0.0,
+    longitude numeric(15,10) DEFAULT 0.0
 );
 
 
@@ -641,4 +643,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150617201209');
 INSERT INTO schema_migrations (version) VALUES ('20150622153049');
 
 INSERT INTO schema_migrations (version) VALUES ('20150623194217');
+
+INSERT INTO schema_migrations (version) VALUES ('20150720125423');
 
