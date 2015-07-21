@@ -30,6 +30,38 @@ namespace :medirectory do
     TaxonomyCode.copy_from StringIO.new(taxonomies), map: taxonomy_map
   end
 
+  desc 'Load zip codes'
+  task :load_zip_codes => :environment do
+    zip_codes = File.read(Rails.root.join('resources', 'US.csv'))
+    zip_codes_map = {
+      'country code' => 'country_code',
+      'postal code' => 'postal_code',
+      'place name' => 'place_name',
+      'admin name1' => 'state',
+      'admin code1' => 'state_code',
+      'admin name2' => 'city',
+      'admin code2' => 'city_code',
+      'admin name3' => 'community',
+      'admin code3' => 'community_code',
+      'latitude' => 'latitude',
+      'longitude' => 'longitude',
+      'accuracy' => 'accuracy'
+    }
+    ZipCode.copy_from StringIO.new(zip_codes), map: zip_codes_map, format: :tab
+  end
+
+
+  desc 'Match addresses to lat/long'
+  task :match_addresses_to_lat_long => :environment do
+    Address.find_each do |address|
+      if zip = ZipCode.find_by(postal_code: address.postal_code[0..4])
+        address.latitude = zip.latitude
+        address.longitude = zip.longitude
+        address.save!
+      end
+    end
+  end
+
   desc 'Populate search-specific provider and organization columns'
   task :populate_search => :environment do
     # Concatenate all name fields and alternate name fields, but don't include the alternate name if it's the same as the primary name
