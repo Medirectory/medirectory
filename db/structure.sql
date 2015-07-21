@@ -24,6 +24,34 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
+-- Name: cube; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS cube WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION cube; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION cube IS 'data type for multidimensional cubes';
+
+
+--
+-- Name: earthdistance; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS earthdistance WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION earthdistance; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION earthdistance IS 'calculate great-circle distances on the surface of the Earth';
+
+
+--
 -- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -338,6 +366,46 @@ ALTER SEQUENCE taxonomy_licenses_id_seq OWNED BY taxonomy_licenses.id;
 
 
 --
+-- Name: zip_codes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE zip_codes (
+    id integer NOT NULL,
+    country_code character varying,
+    postal_code character varying,
+    place_name character varying,
+    state character varying,
+    state_code character varying,
+    city character varying,
+    city_code character varying,
+    community character varying,
+    community_code character varying,
+    latitude numeric(15,10) DEFAULT 0.0,
+    longitude numeric(15,10) DEFAULT 0.0,
+    accuracy integer
+);
+
+
+--
+-- Name: zip_codes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE zip_codes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: zip_codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE zip_codes_id_seq OWNED BY zip_codes.id;
+
+
+--
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -370,6 +438,13 @@ ALTER TABLE ONLY taxonomy_groups ALTER COLUMN id SET DEFAULT nextval('taxonomy_g
 --
 
 ALTER TABLE ONLY taxonomy_licenses ALTER COLUMN id SET DEFAULT nextval('taxonomy_licenses_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY zip_codes ALTER COLUMN id SET DEFAULT nextval('zip_codes_id_seq'::regclass);
 
 
 --
@@ -426,6 +501,21 @@ ALTER TABLE ONLY taxonomy_groups
 
 ALTER TABLE ONLY taxonomy_licenses
     ADD CONSTRAINT taxonomy_licenses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: zip_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY zip_codes
+    ADD CONSTRAINT zip_codes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: addresses_ll_to_earth_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX addresses_ll_to_earth_idx ON addresses USING gist (ll_to_earth((latitude)::double precision, (longitude)::double precision));
 
 
 --
@@ -524,6 +614,13 @@ CREATE INDEX index_taxonomy_groups_on_entity_type_and_entity_id ON taxonomy_grou
 --
 
 CREATE INDEX index_taxonomy_licenses_on_entity_type_and_entity_id ON taxonomy_licenses USING btree (entity_type, entity_id);
+
+
+--
+-- Name: index_zip_codes_on_postal_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_zip_codes_on_postal_code ON zip_codes USING btree (postal_code);
 
 
 --
@@ -645,4 +742,8 @@ INSERT INTO schema_migrations (version) VALUES ('20150622153049');
 INSERT INTO schema_migrations (version) VALUES ('20150623194217');
 
 INSERT INTO schema_migrations (version) VALUES ('20150720125423');
+
+INSERT INTO schema_migrations (version) VALUES ('20150720145610');
+
+INSERT INTO schema_migrations (version) VALUES ('20150720174322');
 
