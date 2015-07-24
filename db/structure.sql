@@ -371,18 +371,9 @@ ALTER SEQUENCE taxonomy_licenses_id_seq OWNED BY taxonomy_licenses.id;
 
 CREATE TABLE zip_codes (
     id integer NOT NULL,
-    country_code character varying,
     postal_code character varying,
-    place_name character varying,
-    state character varying,
-    state_code character varying,
-    city character varying,
-    city_code character varying,
-    community character varying,
-    community_code character varying,
     latitude numeric(15,10) DEFAULT 0.0,
-    longitude numeric(15,10) DEFAULT 0.0,
-    accuracy integer
+    longitude numeric(15,10) DEFAULT 0.0
 );
 
 

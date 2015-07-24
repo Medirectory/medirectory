@@ -32,20 +32,11 @@ namespace :medirectory do
 
   desc 'Load zip codes'
   task :load_zip_codes => :environment do
-    zip_codes = File.read(Rails.root.join('resources', 'US.csv'))
+    zip_codes = File.read(Rails.root.join('resources', 'zip_lat_long.csv'))
     zip_codes_map = {
-      'country code' => 'country_code',
       'postal code' => 'postal_code',
-      'place name' => 'place_name',
-      'admin name1' => 'state',
-      'admin code1' => 'state_code',
-      'admin name2' => 'city',
-      'admin code2' => 'city_code',
-      'admin name3' => 'community',
-      'admin code3' => 'community_code',
       'latitude' => 'latitude',
-      'longitude' => 'longitude',
-      'accuracy' => 'accuracy'
+      'longitude' => 'longitude'
     }
     ZipCode.copy_from StringIO.new(zip_codes), map: zip_codes_map, format: :tab
   end
