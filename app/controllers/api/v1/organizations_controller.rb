@@ -39,11 +39,14 @@ module Api
         if params[:npi]
           organizations = organizations.where(npi: params[:npi])
         end
+        if params[:latitude] and params[:longitude]
+          organizations = organizations.joins(:practice_location_address).within_radius(params[:latitude].to_f, params[:longitude].to_f, 5000)
+        end
 
         # We want to provide a total in addition to a paginated subset of the results
         count = organizations.size
 
-        organizations = organizations.includes(LOAD_INCLUDES)
+        #organizations = organizations.includes(LOAD_INCLUDES)
         organizations = organizations.offset(params[:offset]).limit(RESULTS_PER_PAGE)
 
         respond_to do |format|

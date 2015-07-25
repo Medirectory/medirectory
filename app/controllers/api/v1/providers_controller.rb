@@ -35,6 +35,9 @@ module Api
         if params[:npi]
           providers = providers.where(npi: params[:npi])
         end
+        if params[:latitude] and params[:longitude]
+          providers = providers.joins(:practice_location_address).within_radius(params[:latitude].to_f, params[:longitude].to_f, 5000)
+        end
 
         # We want to provide a total in addition to a paginated subset of the results
         # Note: If we don't have query parameters (all results), this is quite slow; if we need this, see
@@ -44,7 +47,7 @@ module Api
         # Add a secondary order to break search rank ties (which seem to create indeterminism)
         providers = providers.order(:npi)
 
-        providers = providers.includes(LOAD_INCLUDES)
+        #providers = providers.includes(LOAD_INCLUDES)
         providers = providers.offset(params[:offset]).limit(RESULTS_PER_PAGE)
 
         respond_to do |format|
