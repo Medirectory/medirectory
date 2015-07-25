@@ -45,6 +45,6 @@ class Provider < ActiveRecord::Base
     return nil
   end
   
-  scope :within_radius, lambda {|latitude, longitude, metres| where("earth_box(ll_to_earth(?, ?), ?) @> ll_to_earth(latitude, longitude)", latitude, longitude, metres) }
+  scope :within_radius, lambda {|latitude, longitude, metres| where("earth_box(ll_to_earth(?, ?), ?) @> ll_to_earth(practice_location_address_latitude, practice_location_address_longitude)", latitude, longitude, metres) }
 
 end

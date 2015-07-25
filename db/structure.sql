@@ -145,7 +145,9 @@ CREATE TABLE organizations (
     searchable_location character varying,
     searchable_taxonomy character varying,
     searchable_content character varying,
-    searchable_providers character varying
+    searchable_providers character varying,
+    practice_location_address_latitude numeric(15,10) DEFAULT 0.0,
+    practice_location_address_longitude numeric(15,10) DEFAULT 0.0
 );
 
 
@@ -225,7 +227,11 @@ CREATE TABLE providers (
     searchable_location character varying,
     searchable_taxonomy character varying,
     searchable_content character varying,
-    searchable_organization character varying
+    searchable_organization character varying,
+    mailing_address_latitude numeric(15,10) DEFAULT 0.0,
+    mailing_address_longitude numeric(15,10) DEFAULT 0.0,
+    practice_location_address_latitude numeric(15,10) DEFAULT 0.0,
+    practice_location_address_longitude numeric(15,10) DEFAULT 0.0
 );
 
 
@@ -615,6 +621,13 @@ CREATE INDEX index_zip_codes_on_postal_code ON zip_codes USING btree (postal_cod
 
 
 --
+-- Name: organizations_ll_to_earth_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_ll_to_earth_idx ON organizations USING gist (ll_to_earth((practice_location_address_latitude)::double precision, (practice_location_address_longitude)::double precision));
+
+
+--
 -- Name: organizations_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -654,6 +667,20 @@ CREATE INDEX organizations_to_tsvector_idx4 ON organizations USING gin (to_tsvec
 --
 
 CREATE INDEX organizations_to_tsvector_idx5 ON organizations USING gin (to_tsvector('simple'::regconfig, (searchable_providers)::text));
+
+
+--
+-- Name: providers_ll_to_earth_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_ll_to_earth_idx ON providers USING gist (ll_to_earth((practice_location_address_latitude)::double precision, (practice_location_address_longitude)::double precision));
+
+
+--
+-- Name: providers_ll_to_earth_idx1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_ll_to_earth_idx1 ON providers USING gist (ll_to_earth((mailing_address_latitude)::double precision, (mailing_address_longitude)::double precision));
 
 
 --
@@ -737,4 +764,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150720125423');
 INSERT INTO schema_migrations (version) VALUES ('20150720145610');
 
 INSERT INTO schema_migrations (version) VALUES ('20150720174322');
+
+INSERT INTO schema_migrations (version) VALUES ('20150725174502');
 

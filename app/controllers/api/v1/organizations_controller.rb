@@ -40,7 +40,7 @@ module Api
           organizations = organizations.where(npi: params[:npi])
         end
         if params[:latitude] and params[:longitude]
-          organizations = organizations.joins(:practice_location_address).within_radius(params[:latitude].to_f, params[:longitude].to_f, 5000)
+          organizations = organizations.within_radius(params[:latitude].to_f, params[:longitude].to_f, 5000)
         end
 
         # We want to provide a total in addition to a paginated subset of the results
