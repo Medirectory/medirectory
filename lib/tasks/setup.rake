@@ -44,7 +44,7 @@ namespace :medirectory do
 
   desc 'Match addresses to lat/long'
   task :match_addresses_to_lat_long => :environment do
-    Address.find_each do |address|
+    PracticeLocationAddress.find_each do |address|
       if zip = ZipCode.find_by(postal_code: address.postal_code[0..4])
         address.latitude = zip.latitude
         address.longitude = zip.longitude

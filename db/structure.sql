@@ -88,8 +88,8 @@ CREATE TABLE addresses (
     fax_number character varying,
     entity_id integer,
     entity_type character varying,
-    latitude numeric(15,10) DEFAULT 0.0,
-    longitude numeric(15,10) DEFAULT 0.0
+    latitude numeric(15,10),
+    longitude numeric(15,10)
 );
 
 
@@ -146,8 +146,8 @@ CREATE TABLE organizations (
     searchable_taxonomy character varying,
     searchable_content character varying,
     searchable_providers character varying,
-    practice_location_address_latitude numeric(15,10) DEFAULT 0.0,
-    practice_location_address_longitude numeric(15,10) DEFAULT 0.0
+    practice_location_address_latitude numeric(15,10),
+    practice_location_address_longitude numeric(15,10)
 );
 
 
@@ -230,8 +230,8 @@ CREATE TABLE providers (
     searchable_organization character varying,
     mailing_address_latitude numeric(15,10) DEFAULT 0.0,
     mailing_address_longitude numeric(15,10) DEFAULT 0.0,
-    practice_location_address_latitude numeric(15,10) DEFAULT 0.0,
-    practice_location_address_longitude numeric(15,10) DEFAULT 0.0
+    practice_location_address_latitude numeric(15,10),
+    practice_location_address_longitude numeric(15,10)
 );
 
 
@@ -506,13 +506,6 @@ ALTER TABLE ONLY taxonomy_licenses
 
 ALTER TABLE ONLY zip_codes
     ADD CONSTRAINT zip_codes_pkey PRIMARY KEY (id);
-
-
---
--- Name: addresses_ll_to_earth_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX addresses_ll_to_earth_idx ON addresses USING gist (ll_to_earth((latitude)::double precision, (longitude)::double precision));
 
 
 --
