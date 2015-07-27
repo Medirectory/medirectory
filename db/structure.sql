@@ -228,8 +228,6 @@ CREATE TABLE providers (
     searchable_taxonomy character varying,
     searchable_content character varying,
     searchable_organization character varying,
-    mailing_address_latitude numeric(15,10) DEFAULT 0.0,
-    mailing_address_longitude numeric(15,10) DEFAULT 0.0,
     practice_location_address_latitude numeric(15,10),
     practice_location_address_longitude numeric(15,10)
 );
@@ -540,7 +538,7 @@ CREATE INDEX index_addresses_on_first_line ON addresses USING btree (first_line)
 -- Name: index_addresses_on_postal_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_addresses_on_postal_code ON addresses USING btree (postal_code);
+CREATE INDEX index_addresses_on_postal_code ON addresses USING btree (postal_code varchar_pattern_ops);
 
 
 --
@@ -670,13 +668,6 @@ CREATE INDEX providers_ll_to_earth_idx ON providers USING gist (ll_to_earth((pra
 
 
 --
--- Name: providers_ll_to_earth_idx1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX providers_ll_to_earth_idx1 ON providers USING gist (ll_to_earth((mailing_address_latitude)::double precision, (mailing_address_longitude)::double precision));
-
-
---
 -- Name: providers_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -759,4 +750,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150720145610');
 INSERT INTO schema_migrations (version) VALUES ('20150720174322');
 
 INSERT INTO schema_migrations (version) VALUES ('20150725174502');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727061525');
 
