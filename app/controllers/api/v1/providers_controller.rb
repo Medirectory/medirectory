@@ -35,11 +35,13 @@ module Api
         end
         if params[:latitude] and params[:longitude]
           radius = params[:radius].to_i
-          radius ||= 5000
+          radius ||= 1
+          radius = radius * 1609.34
           providers = providers.within_radius(params[:latitude].to_f, params[:longitude].to_f, radius)
         elsif params[:geo_zip]
           radius = params[:radius].to_i
-          radius ||= 5000
+          radius ||= 1
+          radius = radius * 1609.34
           zip_translation = ZipCode.find_by(postal_code: params[:geo_zip])
           providers = providers.within_radius(zip_translation[:latitude].to_f, zip_translation[:longitude].to_f, radius)
         end
