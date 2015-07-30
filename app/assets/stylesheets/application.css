@@ -13,3 +13,56 @@
  *= require_tree .
  *= require_self
  */
+
+body {
+ -webkit-font-smoothing: antialiased;
+ color: #333333;
+ font-family: "News Gothic MT", "Helvetica", "Roboto", "Arial", sans-serif;
+ font-size: 1em;
+ line-height: 1.5;
+ margin: 0;
+ padding: 1em 6em;
+ width: 800px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+ margin: 1em 0;
+ font-family: "Helvetica", "Arial", sans-serif;
+ color: #030303;
+ font-weight: 700;
+ line-height: 1;
+}
+
+p {
+ margin: 0 0 0.75em;
+}
+
+a, code, pre {
+ color: #52C08E;
+ font-weight: bolder;
+ line-height: 1;
+}
+
+a:active,
+a:focus,
+a:hover {
+ color: #5E03A6;
+}
+
+a:active,
+a:focus {
+ outline: none;
+}
+
+li {
+  padding: 1em 0;
+}
+
+p strong, p code {
+  font-size: 1.3em;
+}

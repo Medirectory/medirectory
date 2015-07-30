@@ -24,6 +24,34 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
+-- Name: cube; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS cube WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION cube; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION cube IS 'data type for multidimensional cubes';
+
+
+--
+-- Name: earthdistance; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS earthdistance WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION earthdistance; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION earthdistance IS 'calculate great-circle distances on the surface of the Earth';
+
+
+--
 -- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -59,7 +87,9 @@ CREATE TABLE addresses (
     telephone_number character varying,
     fax_number character varying,
     entity_id integer,
-    entity_type character varying
+    entity_type character varying,
+    latitude numeric(15,10),
+    longitude numeric(15,10)
 );
 
 
@@ -115,7 +145,9 @@ CREATE TABLE organizations (
     searchable_location character varying,
     searchable_taxonomy character varying,
     searchable_content character varying,
-    searchable_providers character varying
+    searchable_providers character varying,
+    practice_location_address_latitude numeric(15,10),
+    practice_location_address_longitude numeric(15,10)
 );
 
 
@@ -195,7 +227,9 @@ CREATE TABLE providers (
     searchable_location character varying,
     searchable_taxonomy character varying,
     searchable_content character varying,
-    searchable_organization character varying
+    searchable_organization character varying,
+    practice_location_address_latitude numeric(15,10),
+    practice_location_address_longitude numeric(15,10)
 );
 
 
@@ -336,6 +370,37 @@ ALTER SEQUENCE taxonomy_licenses_id_seq OWNED BY taxonomy_licenses.id;
 
 
 --
+-- Name: zip_codes; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE zip_codes (
+    id integer NOT NULL,
+    postal_code character varying,
+    latitude numeric(15,10) DEFAULT 0.0,
+    longitude numeric(15,10) DEFAULT 0.0
+);
+
+
+--
+-- Name: zip_codes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE zip_codes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: zip_codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE zip_codes_id_seq OWNED BY zip_codes.id;
+
+
+--
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -368,6 +433,13 @@ ALTER TABLE ONLY taxonomy_groups ALTER COLUMN id SET DEFAULT nextval('taxonomy_g
 --
 
 ALTER TABLE ONLY taxonomy_licenses ALTER COLUMN id SET DEFAULT nextval('taxonomy_licenses_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY zip_codes ALTER COLUMN id SET DEFAULT nextval('zip_codes_id_seq'::regclass);
 
 
 --
@@ -427,6 +499,14 @@ ALTER TABLE ONLY taxonomy_licenses
 
 
 --
+-- Name: zip_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY zip_codes
+    ADD CONSTRAINT zip_codes_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: index_addresses_on_city; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -458,7 +538,7 @@ CREATE INDEX index_addresses_on_first_line ON addresses USING btree (first_line)
 -- Name: index_addresses_on_postal_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_addresses_on_postal_code ON addresses USING btree (postal_code);
+CREATE INDEX index_addresses_on_postal_code ON addresses USING btree (postal_code varchar_pattern_ops);
 
 
 --
@@ -525,6 +605,20 @@ CREATE INDEX index_taxonomy_licenses_on_entity_type_and_entity_id ON taxonomy_li
 
 
 --
+-- Name: index_zip_codes_on_postal_code; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_zip_codes_on_postal_code ON zip_codes USING btree (postal_code);
+
+
+--
+-- Name: organizations_ll_to_earth_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX organizations_ll_to_earth_idx ON organizations USING gist (ll_to_earth((practice_location_address_latitude)::double precision, (practice_location_address_longitude)::double precision));
+
+
+--
 -- Name: organizations_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -564,6 +658,13 @@ CREATE INDEX organizations_to_tsvector_idx4 ON organizations USING gin (to_tsvec
 --
 
 CREATE INDEX organizations_to_tsvector_idx5 ON organizations USING gin (to_tsvector('simple'::regconfig, (searchable_providers)::text));
+
+
+--
+-- Name: providers_ll_to_earth_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX providers_ll_to_earth_idx ON providers USING gist (ll_to_earth((practice_location_address_latitude)::double precision, (practice_location_address_longitude)::double precision));
 
 
 --
@@ -641,4 +742,14 @@ INSERT INTO schema_migrations (version) VALUES ('20150617201209');
 INSERT INTO schema_migrations (version) VALUES ('20150622153049');
 
 INSERT INTO schema_migrations (version) VALUES ('20150623194217');
+
+INSERT INTO schema_migrations (version) VALUES ('20150720125423');
+
+INSERT INTO schema_migrations (version) VALUES ('20150720145610');
+
+INSERT INTO schema_migrations (version) VALUES ('20150720174322');
+
+INSERT INTO schema_migrations (version) VALUES ('20150725174502');
+
+INSERT INTO schema_migrations (version) VALUES ('20150727061525');
 

@@ -30,6 +30,43 @@ namespace :medirectory do
     TaxonomyCode.copy_from StringIO.new(taxonomies), map: taxonomy_map
   end
 
+  desc 'Load zip codes'
+  task :load_zip_codes => :environment do
+    zip_codes = File.read(Rails.root.join('resources', 'zip_lat_long.csv'))
+    zip_codes_map = {
+      'postal code' => 'postal_code',
+      'latitude' => 'latitude',
+      'longitude' => 'longitude'
+    }
+    ZipCode.copy_from StringIO.new(zip_codes), map: zip_codes_map, format: :tab
+  end
+
+
+  desc 'Match addresses to lat/long'
+  task :match_addresses_to_lat_long => :environment do
+    ZipCode.find_each do |zip_code|
+      addresses = PracticeLocationAddress.where("postal_code LIKE ?", "#{zip_code.postal_code}%")
+      addresses.update_all(latitude: zip_code.latitude, longitude: zip_code.longitude)
+    end
+  end
+
+
+  desc 'Populate lat/long fields for faster search'
+  task :populate_lat_long => :environment do
+    count = Provider.update_all("practice_location_address_latitude = addresses.latitude, practice_location_address_longitude = addresses.longitude
+                                                                                  FROM addresses
+                                                                                  WHERE providers.npi = addresses.entity_id
+                                                                                  AND addresses.entity_type = 'Provider'
+                                                                                  AND addresses.type = 'PracticeLocationAddress'")
+    puts "Updated geo search for #{count} Provider records"
+    count = Organization.update_all("practice_location_address_latitude = addresses.latitude, practice_location_address_longitude = addresses.longitude
+                                                                                  FROM addresses
+                                                                                  WHERE organizations.npi = addresses.entity_id
+                                                                                  AND addresses.entity_type = 'Organization'
+                                                                                  AND addresses.type = 'PracticeLocationAddress'")
+    puts "Updated geo search for #{count} Organization records"
+  end
+
   desc 'Populate search-specific provider and organization columns'
   task :populate_search => :environment do
     # Concatenate all name fields and alternate name fields, but don't include the alternate name if it's the same as the primary name

@@ -32,6 +32,9 @@ gem 'oj'
 # Copy CSV into DB
 gem 'postgres-copy'
 
+# Markdown for API documentation
+gem 'rdiscount'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

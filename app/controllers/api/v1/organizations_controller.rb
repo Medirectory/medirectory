@@ -5,9 +5,6 @@ module Api
       SERIALIZATION_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
            {taxonomy_licenses: {include: :taxonomy_code}}, :taxonomy_groups,
            {providers: {include: {taxonomy_licenses: {include: :taxonomy_code}}}} ]
-      LOAD_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
-           {taxonomy_licenses: :taxonomy_code}, :taxonomy_groups,
-           {providers: {taxonomy_licenses: :taxonomy_code}} ]
       RESULTS_PER_PAGE = 10
 
       def index
@@ -39,11 +36,21 @@ module Api
         if params[:npi]
           organizations = organizations.where(npi: params[:npi])
         end
+        if params[:latitude] and params[:longitude] and params[:radius]
+          radius = params[:radius].to_i
+          radius ||= 5000
+          organizations = organizations.within_radius(params[:latitude].to_f, params[:longitude].to_f, params[:radius].to_i)
+        elsif params[:geo_zip]
+          radius = params[:radius].to_i
+          radius ||= 5000
+          zip_translation = ZipCode.find_by(postal_code: params[:geo_zip])
+          organizations = organizations.within_radius(zip_translation[:latitude].to_f, zip_translation[:longitude].to_f, radius)
+        end
 
         # We want to provide a total in addition to a paginated subset of the results
         count = organizations.size
 
-        organizations = organizations.includes(LOAD_INCLUDES)
+        #organizations = organizations.includes(LOAD_INCLUDES)
         organizations = organizations.offset(params[:offset]).limit(RESULTS_PER_PAGE)
 
         respond_to do |format|

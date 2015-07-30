@@ -4,8 +4,6 @@ module Api
     class ProvidersController < ApplicationController
       SERIALIZATION_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
            {taxonomy_licenses: {include: :taxonomy_code}}, :taxonomy_groups, :organizations ]
-      LOAD_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
-           {taxonomy_licenses: :taxonomy_code}, :taxonomy_groups, :organizations ]
       RESULTS_PER_PAGE = 10
 
       def index
@@ -35,6 +33,16 @@ module Api
         if params[:npi]
           providers = providers.where(npi: params[:npi])
         end
+        if params[:latitude] and params[:longitude]
+          radius = (params[:radius] || '1').to_f
+          radius = radius * 1609.34
+          providers = providers.within_radius(params[:latitude].to_f, params[:longitude].to_f, radius)
+        elsif params[:geo_zip]
+          radius = (params[:radius] || '1').to_f
+          radius = radius * 1609.34
+          zip_translation = ZipCode.find_by(postal_code: params[:geo_zip])
+          providers = providers.within_radius(zip_translation[:latitude].to_f, zip_translation[:longitude].to_f, radius)
+        end
 
         # We want to provide a total in addition to a paginated subset of the results
         # Note: If we don't have query parameters (all results), this is quite slow; if we need this, see
@@ -44,7 +52,7 @@ module Api
         # Add a secondary order to break search rank ties (which seem to create indeterminism)
         providers = providers.order(:npi)
 
-        providers = providers.includes(LOAD_INCLUDES)
+        #providers = providers.includes(LOAD_INCLUDES)
         providers = providers.offset(params[:offset]).limit(RESULTS_PER_PAGE)
 
         respond_to do |format|
