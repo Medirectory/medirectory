@@ -12,11 +12,8 @@ module Hpd
     def endpoint
       # default SOAP action
       soap_message = Nokogiri::XML(request.body.read)
-      # soap_body = Nokogiri::XSLT(File.read("#{Rails.root}/lib/hpd/soap_body.xslt")).transform(soap_message)
-      # validate_dsml(soap_body)
-      search_value = soap_message.xpath("//dsml:value/text()", "dsml" => DSML)
-      @providers = Provider.where(first_name: search_value.to_s.upcase)
-      Rails.logger.debug @providers.count
+      search_value = soap_message.xpath("//dsml:searchRequest/dsml:filter/dsml:equalityMatch/dsml:value/text()", "dsml" => DSML)
+      @providers = Provider.where(first_name: search_value.to_s.upcase).limit(10)
       respond_to :soap
     end
 
@@ -29,7 +26,7 @@ module Hpd
     private 
 
     def validate_dsml (soap_body)
-      schema = Nokogiri::XML::Schema(File.read("#{Rails.root}/lib/hpd/schema/DSMLv2.xsd"))
+      schema = Nokogiri::XML::Schema(File.read("#{Rails.root}/public/schema/DSML/DSMLv2.xsd"))
       errors = schema.validate(soap_body).map{|e| e.message}.join(", ")
       raise(StandardError, errors) unless errors.empty?
     end
