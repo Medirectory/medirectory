@@ -7,6 +7,7 @@ module Api
            {providers: {include: {taxonomy_licenses: {include: :taxonomy_code}}}} ]
       RESULTS_PER_PAGE = 10
 
+      api :GET, '/organizations'
       def index
         # Basic search functionality
         organizations = if params[:q]
@@ -60,6 +61,8 @@ module Api
         end
       end
 
+      api :GET, '/organizations/:id'
+      param :id, :number
       def show
         organization = Organization.find(params[:id])
         respond_to do |format|

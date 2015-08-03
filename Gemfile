@@ -35,6 +35,9 @@ gem 'postgres-copy'
 # Markdown for API documentation
 gem 'rdiscount'
 
+# Documentation with API Pie. Using this specific commit as stated in https://github.com/Apipie/apipie-rails/issues/354
+gem 'apipie-rails', github: 'Apipie/apipie-rails', ref: '928bd858fd14ec67eeb9483ba0d43b3be8339608'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
