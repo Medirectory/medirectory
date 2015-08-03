@@ -6,6 +6,25 @@ module Api
            {taxonomy_licenses: {include: :taxonomy_code}}, :taxonomy_groups, :organizations ]
       RESULTS_PER_PAGE = 10
 
+      # Method descriptions at https://github.com/Apipie/apipie-rails#id16
+      api :GET, '/providers/', "Retrieve a list of providers, potentially filtered by search parameters."
+      error :code => 401, :desc => "Unauthorized"
+      error :code => 404, :desc => "Not Found", :meta => {:anything => "you can think of"}
+      # Parameter descriptions at https://github.com/Apipie/apipie-rails#id17
+      param :q, String, :desc => "A search parameter."
+      param :fuzzy_q, String, :desc => "A fuzzy search parameter that will be used."
+      param :offset, :number, :desc => "Defaults to 0. Enables paginated search."
+      param :name, String, :desc => "The name of a provider."
+      param :location, String, :desc => "A location, specified as a state or city."
+      param :taxonomy, String, :desc => "The taxonomy, or speciality, associated with a provider."
+      param :organization, String, :desc => "The organization associated with a provider."
+      param :npi, String, :desc => "The National Provider Identifier."
+      param :latitude, String, :desc => "Provided by geolocation."
+      param :longitude, String, :desc => "Provided by geolocation."
+      param :radius, :number, :desc => "A search radius to search against geo_zip."
+      param :geo_zip, String, :desc => "A zip code to search against."
+      formats ['json', 'xml']
+      meta :message => "Returns results of the query in q or fuzzy_q"
       def index
 
         # Basic search functionality
@@ -71,6 +90,8 @@ module Api
 
       end
 
+      api :GET, '/providers/:id'
+      param :id, :number
       def show
         provider = Provider.find(params[:id])
         respond_to do |format|
