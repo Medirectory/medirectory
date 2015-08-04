@@ -23,7 +23,7 @@ module Hpd
       # Rails.logger.debug request.body.read
     end
 
-    private 
+    private
 
     def validate_dsml (soap_body)
       schema = Nokogiri::XML::Schema(File.read("#{Rails.root}/public/schema/DSML/DSMLv2.xsd"))
