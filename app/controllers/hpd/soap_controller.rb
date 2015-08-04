@@ -48,7 +48,7 @@ module Hpd
 
     def search_request (request)
       filter = request.xpath("//dsml:filter", "dsml" => DSML)
-      query = parse(filter.children.first)
+      query = andElem(filter.children)
       @providers = Provider.where(query[:query], query[:params]).limit(10)
       # Figured this out!!
       # @organizations = Organization.where(query[:query], query[:params]).limit(10)
@@ -64,24 +64,28 @@ module Hpd
           params: {name.intern => value}
         }
       when "and"
-        allQueries = []
-        allParams = {}
-        element.children.each do |child|
-          # combine the seperate parsed children with and merge params
-          values = parse(child)
-          allQueries.push(values[:query])
-          allParams = allParams.merge(values[:params])
-        end
-        {
-          query: '(' + allQueries.join(' AND ') + ')',
-          params: allParams
-        }
+        andElem(element.children)
       else
         {
           query: "",
           params: {}
         }
       end
+    end
+
+    def andElem (children)
+      allQueries = []
+      allParams = {}
+      children.each do |child|
+        # combine the seperate parsed children with and merge params
+        values = parse(child)
+        allQueries.push(values[:query])
+        allParams = allParams.merge(values[:params])
+      end
+      {
+        query: '(' + allQueries.join(' AND ') + ')',
+        params: allParams
+      }
     end
   end
 end
