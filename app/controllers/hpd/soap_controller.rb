@@ -5,7 +5,11 @@ module Hpd
 
     DSML = "urn:oasis:names:tc:DSML:2:0:core"
 
-    lookup_text = { givenName: "first_name", sn: "last_name_legal_name" }
+    LOOKUP_TEXT = { 
+      givenName: "first_name", 
+      sn: "last_name_legal_name",
+      # o: "organization_name_legal_business_name" 
+    }
 
     def wsdl
       respond_to :wsdl
@@ -44,25 +48,40 @@ module Hpd
 
     def search_request (request)
       filter = request.xpath("//dsml:filter", "dsml" => DSML)
-      query = parse (filter.first_element_child)
-      @providers = Provider.where(query.query, query.params).limit(10)
+      query = parse(filter.children.first)
+      @providers = Provider.where(query[:query], query[:params]).limit(10)
+      # Figured this out!!
+      # @organizations = Organization.where(query[:query], query[:params]).limit(10)
     end
 
-    def parse (element)
-      vals = case element.name
-             when "equalityMatch"
-               {
-                 query: lookup_text[element.attr(:name).text().intern] + ' = :' + element.attr(:name).text,
-                 params: {element.attr(:name).text().intern => element.attr(:value).text}
-               }
-             else
-               {
-                 query: "",
-                 params: {}
-               }
-             end
-      return { query: '('+vals.query+')', params: vals.params }
-    end
-
+    def parse (element)
+      case element.name
+      when "equalityMatch"
+        name = element.attr(:name)
+        value = element.text.upcase
+        {
+          query: LOOKUP_TEXT[name.intern] + ' = :' + name,
+          params: {name.intern => value}
+        }
+      when "and"
+        allQueries = []
+        allParams = {}
+        element.children.each do |child|
+          # combine the seperate parsed children with and merge params
+          values = parse(child)
+          allQueries.push(values[:query])
+          allParams = allParams.merge(values[:params])
+        end
+        {
+          query: '(' + allQueries.join(' AND ') + ')',
+          params: allParams
+        }
+      else
+        {
+          query: "",
+          params: {}
+        }
+      end
+    end
   end
 end
