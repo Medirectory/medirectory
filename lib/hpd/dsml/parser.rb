@@ -23,7 +23,7 @@ module Hpd
         result = Hash.new
         result[:search_type] = 'provider'
         filter = request.xpath("//dsml:filter", "dsml" => Hpd::Dsml::XMLNS)
-        query = parse(filter.children[0])
+        query = and_elem(filter.children)
         result.merge!(query)
         Rails.logger.debug result.inspect
         return result
@@ -38,7 +38,7 @@ module Hpd
             # query: LOOKUP_TEXT[name.intern] + ' = :' + name,
             # params: {name.intern => value}
             query: LOOKUP_TEXT[name.intern] + ' = ?',
-            params: value
+            params: [value]
           }
         when "and"
           and_elem(element.children)
@@ -47,7 +47,7 @@ module Hpd
         else
           {
             query: "",
-            params: ""
+            params: []
           }
         end
       end
@@ -60,11 +60,11 @@ module Hpd
           values = parse(child)
           all_queries.push(values[:query])
           # all_params = all_params.merge(values[:params])
-          all_params.push(values[:params])
+          all_params = all_params + values[:params]
         end
         {
           query: '(' + all_queries.join(' AND ') + ')',
-          params: all_params.flatten
+          params: all_params
         }
       end
 
@@ -75,11 +75,11 @@ module Hpd
           values = parse(child)
           all_queries.push(values[:query])
           # all_params = all_params.merge(values[:params])
-          all_params.push(values[:params])
+          all_params = all_params + values[:params]
         end
         {
           query: '(' + all_queries.join(' OR ') + ')',
-          params: all_params.flatten
+          params: all_params
         }
       end
 

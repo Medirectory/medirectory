@@ -20,8 +20,6 @@ module Hpd
       @results.each do |result|
         case result[:type]
         when 'searchRequest'
-          Rails.logger.debug result[:request_result][:query].inspect
-          Rails.logger.debug result[:request_result][:params].inspect
           result[:providers] = Provider.where(result[:request_result][:query], *result[:request_result][:params]).limit(5)
         end
       end
