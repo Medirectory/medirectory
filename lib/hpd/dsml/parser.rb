@@ -44,6 +44,8 @@ module Hpd
           and_elem(element.children)
         when "or"
           or_elem(element.children)
+        when "not"
+          not_elem(element.children)
         else
           {
             query: "",
@@ -79,6 +81,20 @@ module Hpd
         end
         {
           query: '(' + all_queries.join(' OR ') + ')',
+          params: all_params
+        }
+      end
+
+      def self.not_elem(children)
+        all_queries = []
+        all_params = []
+        children.each do |child|
+          values = parse(child)
+          all_queries.push(values[:query])
+          all_params = all_params + values[:params]
+        end
+        {
+          query: 'NOT (' + all_queries.join(' AND ') + ')',
           params: all_params
         }
       end
