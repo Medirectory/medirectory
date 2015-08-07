@@ -9,28 +9,36 @@ module Hpd
       }
 
       # TODO: handle undefined methods (i.e addRequest)
-      def parse_batch(batch_request)
+      def self.parse_batch(batch_request)
         requests = []
         batch_request.children.each do |request|
-          requests.append({type: request.name, result: send(request.name.underscore, request)})
+          requests.append({type: request.name, request_result: send(request.name.underscore, request)})
         end
         return requests
       end
 
-      def search_request(request)
+      def self.search_request(request)
+        # TODO: grab dn
+        Rails.logger.debug "in search_request"
+        result = Hash.new
+        result[:search_type] = 'provider'
         filter = request.xpath("//dsml:filter", "dsml" => Hpd::Dsml::XMLNS)
-        query = and_elem(filter.children)
-        return query
+        query = parse(filter.children[0])
+        result.merge!(query)
+        Rails.logger.debug result.inspect
+        return result
       end
 
-      def parse(element)
+      def self.parse(element)
         case element.name
         when "equalityMatch"
           name = element.attr(:name)
           value = element.text.upcase
           {
-            query: LOOKUP_TEXT[name.intern] + ' = :' + name,
-            params: {name.intern => value}
+            # query: LOOKUP_TEXT[name.intern] + ' = :' + name,
+            # params: {name.intern => value}
+            query: LOOKUP_TEXT[name.intern] + ' = ?',
+            params: value
           }
         when "and"
           and_elem(element.children)
@@ -39,37 +47,39 @@ module Hpd
         else
           {
             query: "",
-            params: {}
+            params: ""
           }
         end
       end
 
-      def and_elem(children)
+      def self.and_elem(children)
         all_queries = []
-        all_params = {}
+        all_params = []
         children.each do |child|
           # combine the seperate parsed children with and merge params
           values = parse(child)
           all_queries.push(values[:query])
-          all_params = all_params.merge(values[:params])
+          # all_params = all_params.merge(values[:params])
+          all_params.push(values[:params])
         end
         {
           query: '(' + all_queries.join(' AND ') + ')',
-          params: all_params
+          params: all_params.flatten
         }
       end
 
-      def or_elem(children)
+      def self.or_elem(children)
         all_queries = []
-        all_params = {}
+        all_params = []
         children.each do |child|
           values = parse(child)
           all_queries.push(values[:query])
-          all_params = all_params.merge(values[:params])
+          # all_params = all_params.merge(values[:params])
+          all_params.push(values[:params])
         end
         {
           query: '(' + all_queries.join(' OR ') + ')',
-          params: all_params
+          params: all_params.flatten
         }
       end
 

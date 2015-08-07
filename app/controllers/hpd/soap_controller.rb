@@ -5,12 +5,6 @@ module Hpd
 
     skip_before_filter :verify_authenticity_token
 
-    LOOKUP_TEXT = {
-      givenName: "first_name",
-      sn: "last_name_legal_name",
-      # o: "organization_name_legal_business_name"
-    }
-
     def wsdl
       respond_to :wsdl
     end
@@ -22,8 +16,15 @@ module Hpd
       end
       batch_request = soap_message.xpath("//dsml:batchRequest", "dsml" => Hpd::Dsml::XMLNS)
       # parse_batch(batch_request)
-      query_string = Hpd::Dsml::Parser.parse_batch(batch_request)
-      @providers = Provider.where(query[:query], query[:params]).limit(10)
+      @results = Hpd::Dsml::Parser.parse_batch(batch_request)
+      @results.each do |result|
+        case result[:type]
+        when 'searchRequest'
+          Rails.logger.debug result[:request_result][:query].inspect
+          Rails.logger.debug result[:request_result][:params].inspect
+          result[:providers] = Provider.where(result[:request_result][:query], *result[:request_result][:params]).limit(5)
+        end
+      end
       respond_to :soap
     end
 
