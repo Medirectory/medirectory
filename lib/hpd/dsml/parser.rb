@@ -5,6 +5,8 @@ module Hpd
       LOOKUP_TEXT = {
         givenName: "first_name",
         sn: "last_name_legal_name",
+        HcPracticeLocation: "city", # just use city for now...
+        Gender: 'gender_code'
         # o: "organization_name_legal_business_name"
       }
 

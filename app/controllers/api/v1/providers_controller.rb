@@ -52,6 +52,9 @@ module Api
         if params[:npi]
           providers = providers.where(npi: params[:npi])
         end
+        if params[:gender]
+          providers = providers.where(gender_code: params[:gender])
+        end
         if params[:latitude] and params[:longitude]
           radius = (params[:radius] || '1').to_f
           radius = radius * 1609.34

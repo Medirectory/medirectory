@@ -20,7 +20,7 @@ module Hpd
       @results.each do |result|
         case result[:type]
         when 'searchRequest'
-          result[:providers] = Provider.where(result[:request_result][:query], *result[:request_result][:params]).limit(5)
+          result[:providers] = Provider.where(result[:request_result][:query], *result[:request_result][:params]).order(:npi).limit(5)
         end
       end
       respond_to :soap
