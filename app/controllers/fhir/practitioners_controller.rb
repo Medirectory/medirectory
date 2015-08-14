@@ -10,6 +10,9 @@ module Fhir
 
       # Add a secondary order to break search rank ties (which seem to create indeterminism)
       providers = providers.order(:npi)
+      if params[:name]
+        providers = providers.complex_search(searchable_name: params[:name])
+      end
       @total = providers.size
       providers = providers.includes(LOAD_INCLUDES)
       providers = providers.offset(params[:offset]).limit(RESULTS_PER_PAGE)

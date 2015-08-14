@@ -1,3 +1,4 @@
+xml = Builder::XmlMarkup.new
 xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
   xml.title "Search Result for param values: " + @params.to_s
   xml.link(rel: "self", href: @link_to[:self]) unless @link_to[:self].empty?
@@ -6,7 +7,9 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
   xml.link(rel: "next", href: @link_to[:next]) unless @link_to[:next].nil?
   xml.link(rel: "last", href: @link_to[:last]) unless @link_to[:last].nil?
   xml.link(rel: "fhir-base", href: @link_to[:fhir_base]) unless @link_to[:base].empty?
-  #xml.tag!('os:totalResults', {"xmlns:os"=>"http://a9.com/-/spec/opensearch/1.1/", value: @total})
+  xml.tag!('os:totalResults', {"xmlns:os"=>"http://a9.com/-/spec/opensearch/1.1/"}) do
+    xml.text! @total.to_s
+  end
   xml.id @link_to[:self]
   xml.author do
     xml.name "Medirectory"
