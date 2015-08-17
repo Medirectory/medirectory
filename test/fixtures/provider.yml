@@ -1,0 +1,191 @@
+provider1:
+  npi: '1891031548'
+  entity_type_code: '1'
+  replacement_npi:
+  last_name_legal_name: FERNYHOUGH
+  first_name: WILL
+  middle_name: S
+  name_prefix:
+  name_suffix:
+  credential:
+  other_last_name:
+  other_first_name:
+  other_middle_name:
+  other_name_prefix:
+  other_name_suffix:
+  other_credential:
+  other_last_name_type_code:
+  enumeration_date: '2012-12-28'
+  last_update_date: '2012-12-28'
+  npi_deactivation_reason_code:
+  npi_deactivation_date:
+  npi_reactivation_date:
+  gender_code: M
+  is_sole_proprietor: N
+  searchable_name: 'WILL S FERNYHOUGH   '
+  searchable_location: BELLEVUE WA 98004
+  searchable_taxonomy: 'Specialist  Specialist '
+  searchable_content: 1891031548 WILL S FERNYHOUGH    BELLEVUE WA 98004 Specialist  Specialist  WILL S FERNYHOUGH DDS PS FERNYHOUGH PERIODONTICS PREMIER PERIODONTICS
+  searchable_organization: WILL S FERNYHOUGH DDS PS FERNYHOUGH PERIODONTICS PREMIER PERIODONTICS
+  practice_location_address_latitude: '47.6183371000'
+  practice_location_address_longitude: '-122.2053410000'
+
+provider2:
+  npi: '1801986955'
+  entity_type_code: '1'
+  replacement_npi:
+  last_name_legal_name: CHUN
+  first_name: KWAN
+  middle_name:
+  name_prefix:
+  name_suffix:
+  credential:
+  other_last_name:
+  other_first_name:
+  other_middle_name:
+  other_name_prefix:
+  other_name_suffix:
+  other_credential:
+  other_last_name_type_code:
+  enumeration_date: '2006-10-12'
+  last_update_date: '2007-07-08'
+  npi_deactivation_reason_code:
+  npi_deactivation_date:
+  npi_reactivation_date:
+  gender_code: M
+  is_sole_proprietor: N
+  searchable_name: 'KWAN  CHUN   '
+  searchable_location: MARTINEZ CA 94553
+  searchable_taxonomy: 'Family Medicine  Family Medicine '
+  searchable_content: 1801986955 KWAN  CHUN    MARTINEZ CA 94553 Family Medicine  Family Medicine  CONTRA COSTA COUNTY CONTRA COSTA REGIONAL MEDICAL CENTER AND HEALTH CENTERS
+  searchable_organization: CONTRA COSTA COUNTY CONTRA COSTA REGIONAL MEDICAL CENTER AND HEALTH CENTERS
+  practice_location_address_latitude: '37.9938923000'
+  practice_location_address_longitude: '-122.1364409000'
+
+provider3:
+  npi: '1619236619'
+  entity_type_code: '1'
+  replacement_npi:
+  last_name_legal_name: ZORN
+  first_name: THOMAS
+  middle_name: AUSTIN
+  name_prefix:
+  name_suffix:
+  credential:
+  other_last_name:
+  other_first_name:
+  other_middle_name:
+  other_name_prefix:
+  other_name_suffix:
+  other_credential:
+  other_last_name_type_code:
+  enumeration_date: '2012-05-10'
+  last_update_date: '2012-05-10'
+  npi_deactivation_reason_code:
+  npi_deactivation_date:
+  npi_reactivation_date:
+  gender_code: M
+  is_sole_proprietor: Y
+  searchable_name: 'THOMAS AUSTIN ZORN   '
+  searchable_location: TALLAHASSEE FL 32308
+  searchable_taxonomy: 'Family Medicine  Family Medicine '
+  searchable_content: 1619236619 THOMAS AUSTIN ZORN    TALLAHASSEE FL 32308 Family Medicine  Family Medicine  TALLAHASSEE MEMORIAL HEALTHCARE INC TALLAHASSEE MEMORIAL FAMILY MEDICINE RESIDENCY PROGRAM
+  searchable_organization: TALLAHASSEE MEMORIAL HEALTHCARE INC TALLAHASSEE MEMORIAL FAMILY MEDICINE RESIDENCY PROGRAM
+  practice_location_address_latitude: '30.4774503000'
+  practice_location_address_longitude: '-84.2269273000'
+
+provider4:
+  npi: '1093814873'
+  entity_type_code: '1'
+  replacement_npi:
+  last_name_legal_name: ISTRE
+  first_name: TODD
+  middle_name: L
+  name_prefix:
+  name_suffix:
+  credential:
+  other_last_name:
+  other_first_name:
+  other_middle_name:
+  other_name_prefix:
+  other_name_suffix:
+  other_credential:
+  other_last_name_type_code:
+  enumeration_date: '2006-09-21'
+  last_update_date: '2007-07-08'
+  npi_deactivation_reason_code:
+  npi_deactivation_date:
+  npi_reactivation_date:
+  gender_code: M
+  is_sole_proprietor: N
+  searchable_name: 'TODD L ISTRE   '
+  searchable_location: BELLAIRE TX 77401
+  searchable_taxonomy: Dentist General Practice Dentist General Practice
+  searchable_content: '1093814873 TODD L ISTRE    BELLAIRE TX 77401 Dentist General Practice Dentist General Practice SOUTH TEXAS DENTAL '
+  searchable_organization: 'SOUTH TEXAS DENTAL '
+  practice_location_address_latitude: '29.7040190000'
+  practice_location_address_longitude: '-95.4609047000'
+
+provider5:
+  npi: '1407287618'
+  entity_type_code: '1'
+  replacement_npi:
+  last_name_legal_name: MOORE
+  first_name: AMBER
+  middle_name: DAWN
+  name_prefix:
+  name_suffix:
+  credential:
+  other_last_name: SOWARDS
+  other_first_name: AMBER
+  other_middle_name: DAWN
+  other_name_prefix:
+  other_name_suffix:
+  other_credential:
+  other_last_name_type_code: '1'
+  enumeration_date: '2013-12-13'
+  last_update_date: '2013-12-13'
+  npi_deactivation_reason_code:
+  npi_deactivation_date:
+  npi_reactivation_date:
+  gender_code: F
+  is_sole_proprietor: Y
+  searchable_name: AMBER DAWN MOORE   SOWARDS
+  searchable_location: NEW LEXINGTON OH 43764
+  searchable_taxonomy: 'Nurse''s Aide  Nurse''s Aide '
+  searchable_content: '1407287618 AMBER DAWN MOORE   SOWARDS NEW LEXINGTON OH 43764 Nurse''s Aide  Nurse''s Aide  '
+  searchable_organization: ''
+  practice_location_address_latitude: '39.7133299000'
+  practice_location_address_longitude: '-82.1806186000'
+
+provider6:
+  npi: '1386843670'
+  entity_type_code: '1'
+  replacement_npi:
+  last_name_legal_name: CANDALINO
+  first_name: BONNIE
+  middle_name: K
+  name_prefix:
+  name_suffix:
+  credential:
+  other_last_name:
+  other_first_name:
+  other_middle_name:
+  other_name_prefix:
+  other_name_suffix:
+  other_credential:
+  other_last_name_type_code:
+  enumeration_date: '2007-07-16'
+  last_update_date: '2007-07-16'
+  npi_deactivation_reason_code:
+  npi_deactivation_date:
+  npi_reactivation_date:
+  gender_code: F
+  is_sole_proprietor: Y
+  searchable_name: 'BONNIE K CANDALINO   '
+  searchable_location: DELAND FL 32720
+  searchable_taxonomy: 'Developmental Therapist  Developmental Therapist '
+  searchable_content: '1386843670 BONNIE K CANDALINO    DELAND FL 32720 Developmental Therapist  Developmental Therapist  '
+  searchable_organization: ''
+  practice_location_address_latitude: '29.0033830000'
+  practice_location_address_longitude: '-81.3685839000'

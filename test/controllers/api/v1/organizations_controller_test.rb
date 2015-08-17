@@ -3,8 +3,6 @@ require 'test_helper'
 class OrganizationsControllerTest < ActionController::TestCase
 
   def setup
-    @organization = Organization.new(npi: 456)
-    @organization.save!
     @controller = Api::V1::OrganizationsController.new
   end
 
@@ -19,7 +17,7 @@ class OrganizationsControllerTest < ActionController::TestCase
   end
 
   test "should show a result" do
-    get :show, :id => 456, :format => :json
+    get :show, :id => 1093062572, :format => :json
     assert_response :success
   end
 
@@ -30,11 +28,6 @@ class OrganizationsControllerTest < ActionController::TestCase
   end
 
   test "should return the right number of organizations" do
-    5.times do |i|
-      organization = Organization.new(npi: i)
-      organization.save!
-    end
-
     get :index, {format: :json}
     assert_equal 6, JSON.parse(response.body)['organizations'].length
   end
