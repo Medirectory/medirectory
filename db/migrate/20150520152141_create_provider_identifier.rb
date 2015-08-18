@@ -1,6 +1,6 @@
-class CreateOtherProviderIdentifier < ActiveRecord::Migration
+class CreateProviderIdentifier < ActiveRecord::Migration
   def change
-    create_table :other_provider_identifiers do |t|
+    create_table :provider_identifiers do |t|
       t.string :identifier
       t.string :identifier_type_code
       t.string :identifier_state

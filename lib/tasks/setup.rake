@@ -97,17 +97,17 @@ namespace :medirectory do
                                                                        ' ')")
     puts "Updated taxonomy search for #{count} records"
 
-    count = Provider.update_all("searchable_organization = ARRAY_TO_STRING(ARRAY(SELECT CONCAT_WS(' ', COALESCE(organizations.organization_name_legal_business_name, ''),
-                                                                                                       COALESCE(organizations.other_organization_name, ''))
-                                                                                 FROM organizations_providers, organizations
-                                                                                 WHERE providers.npi = organizations_providers.provider_id
-                                                                                 AND organizations_providers.organization_id = organizations.npi),
-                                                                           ' ')")
+    count = Provider.update_all("searchable_organizations = ARRAY_TO_STRING(ARRAY(SELECT CONCAT_WS(' ', COALESCE(organizations.organization_name_legal_business_name, ''),
+                                                                                                        COALESCE(organizations.other_organization_name, ''))
+                                                                                  FROM organizations_providers, organizations
+                                                                                  WHERE providers.npi = organizations_providers.provider_id
+                                                                                  AND organizations_providers.organization_id = organizations.npi),
+                                                                            ' ')")
     puts "Updated organization search for #{count} records"
 
 
     # Also create a more generic searchable field that includes all searchable content of interest (ie npi, name, city, zip, specialty)
-    count = Provider.update_all("searchable_content = CONCAT_WS(' ', npi, searchable_name, searchable_location, searchable_taxonomy, searchable_organization)")
+    count = Provider.update_all("searchable_content = CONCAT_WS(' ', npi, searchable_name, searchable_location, searchable_taxonomy, searchable_organizations)")
     puts "Updated full search for #{count} records"
 
 

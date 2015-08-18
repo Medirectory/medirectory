@@ -47,7 +47,7 @@ module Api
           providers = providers.complex_search(searchable_taxonomy: params[:taxonomy])
         end
         if params[:organization]
-          providers = providers.complex_search(searchable_organization: params[:organization])
+          providers = providers.complex_search(searchable_organizations: params[:organization])
         end
         if params[:npi]
           providers = providers.where(npi: params[:npi])

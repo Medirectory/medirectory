@@ -5,8 +5,6 @@ class CreateTaxonomyCodes < ActiveRecord::Migration
       t.string :taxonomy_type
       t.string :classification
       t.string :specialization
-      t.string :definition
-      t.string :notes
     end
   end
 end
