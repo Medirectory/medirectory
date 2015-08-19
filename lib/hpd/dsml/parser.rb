@@ -6,9 +6,19 @@ module Hpd
         givenName: "first_name",
         sn: "last_name_legal_name",
         HcPracticeLocation: "city", # just use city for now...
-        Gender: 'gender_code'
-        # o: "organization_name_legal_business_name"
+        Gender: 'gender_code',
+        o: "organization_name_legal_business_name"
       }
+
+      def self.parse_dn(dn_str)
+        values = Hash.new
+        array = dn_str.split(',')
+        array.each do |e|
+          value_pair = e.split('=')
+          values[value_pair[0]] = value_pair[1]
+        end
+        return values
+      end
 
       # TODO: handle undefined methods (i.e addRequest)
       def self.parse_batch(batch_request)
@@ -21,13 +31,11 @@ module Hpd
 
       def self.search_request(request)
         # TODO: grab dn
-        Rails.logger.debug "in search_request"
         result = Hash.new
-        result[:search_type] = 'provider'
         filter = request.xpath("//dsml:filter", "dsml" => Hpd::Dsml::XMLNS)
+        result[:search_type] = parse_dn(request.attribute("dn").value)["ou"]
         query = and_elem(filter.children)
         result.merge!(query)
-        Rails.logger.debug result.inspect
         return result
       end
 
@@ -37,8 +45,6 @@ module Hpd
           name = element.attr(:name)
           value = element.text.upcase
           {
-            # query: LOOKUP_TEXT[name.intern] + ' = :' + name,
-            # params: {name.intern => value}
             query: LOOKUP_TEXT[name.intern] + ' = ?',
             params: [value]
           }
@@ -63,7 +69,6 @@ module Hpd
           # combine the seperate parsed children with and merge params
           values = parse(child)
           all_queries.push(values[:query])
-          # all_params = all_params.merge(values[:params])
           all_params = all_params + values[:params]
         end
         {
@@ -78,7 +83,6 @@ module Hpd
         children.each do |child|
           values = parse(child)
           all_queries.push(values[:query])
-          # all_params = all_params.merge(values[:params])
           all_params = all_params + values[:params]
         end
         {

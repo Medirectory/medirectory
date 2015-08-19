@@ -20,7 +20,12 @@ module Hpd
       @results.each do |result|
         case result[:type]
         when 'searchRequest'
-          result[:providers] = Provider.where(result[:request_result][:query], *result[:request_result][:params]).order(:npi).limit(5)
+          case result[:request_result][:search_type]
+          when 'HcProfessional'
+            result[:providers] = Provider.where(result[:request_result][:query], *result[:request_result][:params]).order(:npi).limit(5)
+          when 'HcRegulatedOrganization'
+            result[:orgs] = Organization.where(result[:request_result][:query], *result[:request_result][:params]).order(:npi).limit(5)
+          end
         end
       end
       respond_to :soap
