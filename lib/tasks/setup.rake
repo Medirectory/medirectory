@@ -67,6 +67,18 @@ namespace :medirectory do
     puts "Updated geo search for #{count} Organization records"
   end
 
+  desc 'Populate electronic service data with made-up, synthetic data'
+  task :populate_electronic_services => :environment do
+    Provider.includes(:organizations).find_each do |provider|
+      provider.organizations.each do |organization|
+        organization_name = (organization.other_organization_name || organization.organization_name_legal_business_name).gsub(/[^a-zA-Z]/, '')
+        provider_name = "#{provider.first_name.gsub(/[^a-zA-Z]/, '')}.#{provider.last_name_legal_name.gsub(/[^a-zA-Z]/, '')}"
+        email = "#{provider_name}@#{organization_name}.com".downcase
+        provider.electronic_services.create(address: email, integration_profile: 'DirectProjectSMTP', organization: organization)
+      end
+    end
+  end
+
   desc 'Populate search-specific provider and organization columns'
   task :populate_search => :environment do
     # Concatenate all name fields and alternate name fields, but don't include the alternate name if it's the same as the primary name
