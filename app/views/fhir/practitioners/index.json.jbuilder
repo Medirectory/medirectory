@@ -11,12 +11,12 @@ json.link [{rel: "self", href: @link_to[:self]},
 end
 json.totalResults @total
 json.id @link_to[:self]
-json.author [""] do
+json.author [nil] do
   json.name "Medirectory"
 end
 json.entry @providers do |provider|
     json.title provider.first_name.to_s + " " + provider.middle_name.to_s + " " + provider.last_name_legal_name.to_s
-    json.id @link_to[:base] Rails.application.routes.url_helpers.fhir_practitioner_path(provider.npi, format: :json)
+    json.id @link_to[:base] + Rails.application.routes.url_helpers.fhir_practitioner_path(provider.npi, format: :json)
     json.updated provider.last_update_date.to_s + "T00:00:00"
     json.published (provider.npi_reactivation_date || provider.enumeration_date).to_s + "T00:00:00"
     json.author [""] do
