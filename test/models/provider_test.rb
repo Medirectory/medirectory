@@ -11,10 +11,10 @@ class ProviderTest < ActiveSupport::TestCase
   end
 
   test "Provider can be created with an NPI" do
-    assert_equal 0, Provider.count
+    original_count = Provider.count
     @provider = Provider.new(npi: '123')
     @provider.save!
-    assert_equal 1, Provider.count
+    assert_equal original_count+1, Provider.count
   end
 
   test "Provider tries to find an associated organization" do

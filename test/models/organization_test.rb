@@ -11,10 +11,10 @@ class OrganizationTest < ActiveSupport::TestCase
   end
 
   test "Organization can be created with an NPI" do
-    assert_equal 0, Organization.count
+    original_count = Organization.count
     @organization = Organization.new(npi: '123')
     @organization.save!
-    assert_equal 1, Organization.count
+    assert_equal original_count+1, Organization.count
   end
 
   test "Organization tries to find an associated providers" do
