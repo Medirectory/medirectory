@@ -11,6 +11,7 @@ class Organization < ActiveRecord::Base
   has_many :taxonomy_licenses, as: :entity
   has_many :taxonomy_codes, through: :taxonomy_licenses
   has_and_belongs_to_many :providers
+  has_many :electronic_services
 
   # Use heuristics to find providers that are likely to be part of this organization
   def likely_providers
