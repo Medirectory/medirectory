@@ -15,4 +15,9 @@ Rails.application.routes.draw do
     resources :practitioners, only: [:index, :show], defaults: { format: "xml" }
   end
 
+  namespace :hpd do
+    get 'wsdl', to: 'soap#wsdl', defaults: { format: :wsdl }
+    post 'endpoint', to: 'soap#endpoint', defaults: { format: :soap }
+  end
+
 end
