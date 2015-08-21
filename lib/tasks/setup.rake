@@ -16,6 +16,29 @@ namespace :medirectory do
     end
   end
 
+  desc 'Use Physician Compare dataset to extend provider / organization mapping'
+  task :add_physician_compare_data => :environment do
+    raise "Please provide location of physician compare data via FILE parameter" unless ENV['FILE']
+    require 'csv'
+    matches = 0
+    CSV.foreach(Rails.root.join('PhysicianCompareData.csv'), headers: true) do |csv|
+      next unless csv['Organization legal name']
+      next unless provider = Provider.includes(:organizations).find_by_npi(csv['NPI'])
+      # Use the claims based hospital affiliation fields because those have Medicare CCNs, which may provide better matching fidelity
+      (1..5).each do |i|
+        matching_identifiers = OtherProviderIdentifier.where(identifier: csv["Claims based hospital affiliation CCN #{i}"]).select do |pi|
+          pi.entity_type == 'Organization' && pi.entity.organization_name_legal_business_name == csv["Claims based hospital affiliation LBN #{i}"]
+        end
+        if matching_identifiers.size > 0
+          matches += 1
+          puts "#{matches} matches" if matches % 100 == 0
+        end
+        provider.organizations |= matching_identifiers.map(&:entity)
+      end
+    end
+    puts "#{matches} total matches"
+  end
+
   desc 'Load taxonomy mapping'
   task :load_taxonomy_map => :environment do
     taxonomies = File.read(Rails.root.join('resources', 'taxonomy_codes.csv')).encode('UTF-8', 'ISO8859-1')
