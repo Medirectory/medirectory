@@ -118,7 +118,6 @@ ALTER SEQUENCE addresses_id_seq OWNED BY addresses.id;
 
 CREATE TABLE electronic_services (
     id integer NOT NULL,
-    esi_type character varying,
     address character varying,
     integration_profile character varying,
     content_profile character varying,

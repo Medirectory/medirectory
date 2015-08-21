@@ -3,7 +3,7 @@ module Api
 
     class ProvidersController < ApplicationController
       SERIALIZATION_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
-           {taxonomy_licenses: {include: :taxonomy_code}}, :taxonomy_groups, :organizations ]
+           {taxonomy_licenses: {include: :taxonomy_code}}, :taxonomy_groups, :organizations, :electronic_services ]
       RESULTS_PER_PAGE = 10
 
       # Method descriptions at https://github.com/Apipie/apipie-rails#id16
