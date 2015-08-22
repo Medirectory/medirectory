@@ -113,6 +113,42 @@ ALTER SEQUENCE addresses_id_seq OWNED BY addresses.id;
 
 
 --
+-- Name: electronic_services; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE electronic_services (
+    id integer NOT NULL,
+    address character varying,
+    integration_profile character varying,
+    content_profile character varying,
+    digital_certificate character varying,
+    provider_id integer,
+    organization_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: electronic_services_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE electronic_services_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: electronic_services_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE electronic_services_id_seq OWNED BY electronic_services.id;
+
+
+--
 -- Name: organizations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -411,6 +447,13 @@ ALTER TABLE ONLY addresses ALTER COLUMN id SET DEFAULT nextval('addresses_id_seq
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY electronic_services ALTER COLUMN id SET DEFAULT nextval('electronic_services_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY other_provider_identifiers ALTER COLUMN id SET DEFAULT nextval('other_provider_identifiers_id_seq'::regclass);
 
 
@@ -448,6 +491,14 @@ ALTER TABLE ONLY zip_codes ALTER COLUMN id SET DEFAULT nextval('zip_codes_id_seq
 
 ALTER TABLE ONLY addresses
     ADD CONSTRAINT addresses_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: electronic_services_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY electronic_services
+    ADD CONSTRAINT electronic_services_pkey PRIMARY KEY (id);
 
 
 --
@@ -560,6 +611,20 @@ CREATE INDEX index_addresses_on_state ON addresses USING btree (state);
 --
 
 CREATE INDEX index_addresses_on_telephone_number ON addresses USING btree (telephone_number);
+
+
+--
+-- Name: index_electronic_services_on_organization_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_electronic_services_on_organization_id ON electronic_services USING btree (organization_id);
+
+
+--
+-- Name: index_electronic_services_on_provider_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_electronic_services_on_provider_id ON electronic_services USING btree (provider_id);
 
 
 --
@@ -752,4 +817,6 @@ INSERT INTO schema_migrations (version) VALUES ('20150720174322');
 INSERT INTO schema_migrations (version) VALUES ('20150725174502');
 
 INSERT INTO schema_migrations (version) VALUES ('20150727061525');
+
+INSERT INTO schema_migrations (version) VALUES ('20150820160925');
 

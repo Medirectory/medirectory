@@ -30,6 +30,7 @@ class Provider < ActiveRecord::Base
   has_many :taxonomy_licenses, as: :entity
   has_many :taxonomy_codes, through: :taxonomy_licenses
   has_and_belongs_to_many :organizations
+  has_many :electronic_services
 
   # Use heuristics to find the organization this provider is likely associated with
   def likely_organization
