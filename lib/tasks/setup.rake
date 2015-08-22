@@ -21,7 +21,7 @@ namespace :medirectory do
     raise "Please provide location of physician compare data via FILE parameter" unless ENV['FILE']
     require 'csv'
     matches = 0
-    CSV.foreach(Rails.root.join('PhysicianCompareData.csv'), headers: true) do |csv|
+    CSV.foreach(Rails.root.join(ENV['FILE']), headers: true) do |csv|
       next unless csv['Organization legal name']
       next unless provider = Provider.includes(:organizations).find_by_npi(csv['NPI'])
       # Use the claims based hospital affiliation fields because those have Medicare CCNs, which may provide better matching fidelity
