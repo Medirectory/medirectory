@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   namespace :fhir do
     resources :metadata, only: [:index], defaults: { format: "xml" }
     resources :practitioners, only: [:index, :show], defaults: { format: "xml" }
+    resources :organizations, only: [:index, :show], defaults: { format: "xml" }
   end
 
   namespace :hpd do
