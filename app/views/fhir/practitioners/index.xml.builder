@@ -25,7 +25,7 @@ xml.feed(xmlns:"http://www.w3.org/2005/Atom") do
         xml.uri "https://nppes.cms.hhs.gov"
       end
       xml.content do
-        xml << render(:partial => 'fhir/practitioners/xml/practitioner.xml.builder', locals: { provider: provider })
+        xml << render(:partial => 'fhir/shared_elements/xml/practitioner.xml.builder', locals: { provider: provider })
         # xml << render(:partial => 'fhir/practitioners/xml/resource.xml.builder', locals: {
         #   reference: Rails.application.routes.url_helpers.fhir_practitioner_path(provider.npi, format: :xml),
         #   display: provider.first_name.to_s + " " + provider.last_name_legal_name.to_s})

@@ -24,7 +24,7 @@ json.entry @providers do |provider|
       json.uri "https://nppes.cms.hhs.gov"
     end
     json.content do
-      json.partial! 'fhir/practitioners/json/practitioner', provider: provider
+      json.partial! 'fhir/shared_elements/json/practitioner', provider: provider
       # json.partial! 'fhir/practitioners/json/resource.json.jbuilder', locals: {
       #   reference: Rails.application.routes.url_helpers.fhir_practitioner_path(provider.npi, format: :json),
       #   display: provider.first_name.to_s + " " + provider.last_name_legal_name.to_s}
