@@ -9,35 +9,35 @@ json.format ["json", "json"]
 json.rest [nil] do
   json.mode "server"
   json.documentation "Only implements practitioners"
-  json.resource [nil] do
-    json.type "Practitioner"
+  json.resource ["Practitioner", "Organization"] do |resource|
+    json.type resource
     json.operation [nil] do
       json.code "read"
       json.documentation "can only retrieve via ids"
     end
     json.operation [nil] do
       json.code "search-type"
-      json.documentation "No search criteria leads to all practitioners beings returned"
+      json.documentation "No search criteria leads to all #{resource}s beings returned"
     end
     json.searchParam [nil] do
       json.name "_id"
       json.type "string"
-      json.documentation "All practitioners with id"
+      json.documentation "All #{resource}s with id"
     end
     json.searchParam [nil] do
       json.name "name"
       json.type "string"
-      json.documentation "All practitioners with first or last name matching value"
+      json.documentation "All #{resource}s with first or last name matching value"
     end
     json.searchParam [nil] do
       json.name "given_name"
       json.type "string"
-      json.documentation "All practitioners with first name matching value"
-    end
+      json.documentation "All #{resource}s with first name matching value"
+    end if resource == "Practitioner"
     json.searchParam [nil] do
       json.name "family_name"
       json.type "string"
-      json.documentation "All practitioners with last name matching value"
-    end
+      json.documentation "All #{resource}s with last name matching value"
+    end if resource == "Practitioner"
   end
 end
