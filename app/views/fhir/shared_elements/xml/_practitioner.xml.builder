@@ -16,11 +16,12 @@ xml.Practitioner(xmlns:"http://hl7.org/fhir") do
     xml.prefix(value: provider.name_prefix) if provider.name_prefix
     xml.prefix(value: provider.name_suffix) if provider.name_suffix
   end
-
-  [{ system: "phone", number: provider.mailing_address.telephone_number, period: nil },
-    { system: "fax", number: provider.mailing_address.fax_number, period: nil },
-    { system: "phone", number: provider.practice_location_address.telephone_number, period: nil },
-    { system: "fax", number: provider.practice_location_address.fax_number, period: nil }].each do |locals|
+  telecoms = []
+  telecoms = telecoms + [{ system: "phone", number: provider.mailing_address.telephone_number, period: nil },
+    { system: "fax", number: provider.mailing_address.fax_number, period: nil }] if provider.mailing_address
+  telecoms = telecoms + [{ system: "phone", number: provider.practice_location_address.telephone_number, period: nil },
+    { system: "fax", number: provider.practice_location_address.fax_number, period: nil }] if provider.practice_location_address
+  telecoms.each do |locals|
     xml.telecom do
       xml << render(partial: 'fhir/shared_elements/xml/contact.xml.builder', locals: locals)
     end unless locals[:number].blank?
@@ -28,7 +29,7 @@ xml.Practitioner(xmlns:"http://hl7.org/fhir") do
 
   xml.address do
     xml << render(partial: 'fhir/shared_elements/xml/address.xml.builder', locals: {address: provider.practice_location_address})
-  end
+  end if provider.practice_location_address
 
   xml.gender do
     xml << render(partial: 'fhir/shared_elements/xml/codeable_concept.xml.builder',

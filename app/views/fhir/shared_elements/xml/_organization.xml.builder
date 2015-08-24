@@ -13,10 +13,13 @@ xml.Organization(xmlns:"http://hl7.org/fhir") do
       locals: {codings: [{code: "prov", display: "Healthcare Provider"}], text: nil})
   end
 
-  [{ system: "phone", number: organization.mailing_address.telephone_number, period: nil },
-    { system: "fax", number: organization.mailing_address.fax_number, period: nil },
-    { system: "phone", number: organization.practice_location_address.telephone_number, period: nil },
-    { system: "fax", number: organization.practice_location_address.fax_number, period: nil }].each do |locals|
+
+  telecoms = []
+  telecoms = telecoms + [{ system: "phone", number: organization.mailing_address.telephone_number, period: nil },
+    { system: "fax", number: organization.mailing_address.fax_number, period: nil }] if organization.mailing_address
+  telecoms = telecoms + [{ system: "phone", number: organization.practice_location_address.telephone_number, period: nil },
+    { system: "fax", number: organization.practice_location_address.fax_number, period: nil }] if organization.practice_location_address
+  telecoms.each do |locals|
     xml.telecom do
       xml << render(partial: 'fhir/shared_elements/xml/contact.xml.builder', locals: locals)
     end unless locals[:number].blank?
@@ -25,7 +28,7 @@ xml.Organization(xmlns:"http://hl7.org/fhir") do
   [organization.practice_location_address, organization.mailing_address].each do |address|
     xml.address do
       xml << render(partial: 'fhir/shared_elements/xml/address.xml.builder', locals: {address: address})
-    end
+    end if address
   end
 
   # This may be something to try in the near future

@@ -20,16 +20,18 @@ json.name do
   json.prefix [provider.name_suffix] if provider.name_suffix
 end
 
-json.telecom [{ system: "phone", number: provider.mailing_address.telephone_number },
-  { system: "fax", number: provider.mailing_address.fax_number },
-  { system: "phone", number: provider.practice_location_address.telephone_number },
-  { system: "fax", number: provider.practice_location_address.fax_number }] do |locals|
+telecoms = []
+telecoms = telecoms + [{ system: "phone", number: provider.mailing_address.telephone_number, period: nil },
+  { system: "fax", number: provider.mailing_address.fax_number, period: nil }] if provider.mailing_address
+telecoms = telecoms + [{ system: "phone", number: provider.practice_location_address.telephone_number, period: nil },
+  { system: "fax", number: provider.practice_location_address.fax_number, period: nil }] if provider.practice_location_address
+json.telecom telecoms do |locals|
   json.partial! 'fhir/shared_elements/json/contact.json.jbuilder', locals: locals unless locals[:number].blank?
 end
 
 json.address do
   json.partial! 'fhir/shared_elements/json/address.json.jbuilder', locals: { address: provider.practice_location_address}
-end
+end if provider.practice_location_address
 
 json.gender do
   json.partial! 'fhir/shared_elements/json/codeable_concept.json.jbuilder',
