@@ -1,9 +1,11 @@
 module Fhir
   module PractitionerParser
-      LOOKUP_NAMES = {
-        _id: :npi,
+      LOOKUP_STRINGS = {
         given: :first_name,
         family: :last_name_legal_name
+      }
+      LOOKUP_TOKENS = {
+        _id: :npi
       }
       T = Provider.arel_table
 
@@ -14,8 +16,10 @@ module Fhir
           to_return = T[:first_name].matches_any(split_values).or(
             T[:last_name_legal_name].matches_any(split_values)
             )
+        when LOOKUP_TOKENS[name.intern]
+          to_return = T[LOOKUP_TOKENS[name.intern].intern].eq_any(split_values) if LOOKUP_TOKENS[name.intern]
         else
-          to_return = T[LOOKUP_NAMES[name.intern].intern].matches_any(split_values) if LOOKUP_NAMES[name.intern]
+          to_return = T[LOOKUP_STRINGS[name.intern].intern].matches_any(split_values) if LOOKUP_STRINGS[name.intern]
         end
         to_return
       end
@@ -27,8 +31,10 @@ module Fhir
           to_return = T[:first_name].eq_any(split_values).or(
             T[:last_name_legal_name].eq_any(split_values)
             )
+        when LOOKUP_TOKENS[name.intern]
+          to_return = T[LOOKUP_TOKENS[name.intern].intern].eq_any(split_values) if LOOKUP_TOKENS[name.intern]
         else
-          to_return = T[LOOKUP_NAMES[name.intern].intern].eq_any(split_values) if LOOKUP_NAMES[name.intern]
+          to_return = T[LOOKUP_STRINGS[name.intern].intern].eq_any(split_values) if LOOKUP_STRINGS[name.intern]
         end
         to_return
       end
@@ -47,11 +53,17 @@ module Fhir
               T[:last_name_legal_name].not_eq(nil)
             )
           end
+        when LOOKUP_TOKENS[name.intern]
+          if missing
+            to_return = T[LOOKUP_TOKENS[name.intern].intern].eq(nil) if LOOKUP_TOKENS[name.intern]
+          else
+            to_return = T[LOOKUP_TOKENS[name.intern].intern].not_eq(nil) if LOOKUP_TOKENS[name.intern]
+          end
         else
           if missing
-            to_return = T[LOOKUP_NAMES[name.intern].intern].eq(nil) if LOOKUP_NAMES[name.intern]
+            to_return = T[LOOKUP_STRINGS[name.intern].intern].eq(nil) if LOOKUP_STRINGS[name.intern]
           else
-            to_return = T[LOOKUP_NAMES[name.intern].intern].not_eq(nil) if LOOKUP_NAMES[name.intern]
+            to_return = T[LOOKUP_STRINGS[name.intern].intern].not_eq(nil) if LOOKUP_STRINGS[name.intern]
           end
 
         end
