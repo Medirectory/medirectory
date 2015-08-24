@@ -19,11 +19,11 @@ json.rest [nil] do
       json.code "search-type"
       json.documentation "No search criteria leads to all #{resource}s beings returned"
     end
-    json.searchParam [nil] do
-      json.name "_id"
-      json.type "string"
-      json.documentation "All #{resource}s with id"
-    end
+    # json.searchParam [nil] do
+    #   json.name "_id"
+    #   json.type "string"
+    #   json.documentation "All #{resource}s with id"
+    # end
     json.searchParam [nil] do
       json.name "name"
       json.type "string"

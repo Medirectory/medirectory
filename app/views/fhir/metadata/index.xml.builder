@@ -19,11 +19,11 @@ xml.Conformance(xmlns:"http://hl7.org/fhir") do
         xml.code(value: "search-type")
         xml.documentation(value: "No search criteria leads to all Practitioners beings returned")
       end
-      xml.searchParam do
-        xml.name(value: "_id")
-        xml.type(value: "string")
-        xml.documentation(value: "All Practitioners with id")
-      end
+      # xml.searchParam do
+      #   xml.name(value: "_id")
+      #   xml.type(value: "string")
+      #   xml.documentation(value: "All Practitioners with id")
+      # end
       xml.searchParam do
         xml.name(value: "name")
         xml.type(value: "string")
@@ -49,11 +49,11 @@ xml.Conformance(xmlns:"http://hl7.org/fhir") do
         xml.code(value: "search-type")
         xml.documentation(value: "No search criteria leads to all organizations beings returned")
       end
-      xml.searchParam do
-        xml.name(value: "_id")
-        xml.type(value: "string")
-        xml.documentation(value: "All Organizations with id")
-      end
+      # xml.searchParam do
+      #   xml.name(value: "_id")
+      #   xml.type(value: "string")
+      #   xml.documentation(value: "All Organizations with id")
+      # end
       xml.searchParam do
         xml.name(value: "name")
         xml.type(value: "string")

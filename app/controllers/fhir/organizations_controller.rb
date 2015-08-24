@@ -4,7 +4,7 @@ module Fhir
   class OrganizationsController < ApplicationController
     LOAD_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
          {taxonomy_licenses: :taxonomy_code}, :taxonomy_groups, :providers ]
-    RESULTS_PER_PAGE = 3
+    RESULTS_PER_PAGE = 8
 
     def index
       # a number of queries in FHIR run off the "matches any part of"
