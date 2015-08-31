@@ -7,24 +7,74 @@ module Api
       RESULTS_PER_PAGE = 10
 
       # Method descriptions at https://github.com/Apipie/apipie-rails#id16
-      api :GET, '/providers/', "Retrieve a list of providers, potentially filtered by search parameters."
-      error :code => 401, :desc => "Unauthorized"
-      error :code => 404, :desc => "Not Found", :meta => {:anything => "you can think of"}
-      # Parameter descriptions at https://github.com/Apipie/apipie-rails#id17
-      param :q, String, :desc => "A search parameter."
-      param :fuzzy_q, String, :desc => "A fuzzy search parameter that will be used."
-      param :offset, :number, :desc => "Defaults to 0. Enables paginated search."
-      param :name, String, :desc => "The name of a provider."
-      param :location, String, :desc => "A location, specified as a state or city."
-      param :taxonomy, String, :desc => "The taxonomy, or speciality, associated with a provider."
-      param :organization, String, :desc => "The organization associated with a provider."
-      param :npi, String, :desc => "The National Provider Identifier."
-      param :latitude, String, :desc => "Provided by geolocation."
-      param :longitude, String, :desc => "Provided by geolocation."
-      param :radius, :number, :desc => "A search radius to search against geo_zip."
-      param :geo_zip, String, :desc => "A zip code to search against."
+      api :GET, '/providers', "Returns paginated results of a user-submitted search query. Will return all results if no parameters specified."
+      description 'All parameters are optional, and can be combined to create more complex searches. If multiple search parameters are supplied they are combined using an implicit AND operator. Any parameter that accepts a string can use the following special search terms:
+
+      OR: return results that match either term; example: `location=chicago+OR+miami`
+
+      AND: return results that match both terms; example: `name=lee+AND+johnathan`
+
+      NOT: return results that do not match the term; example: `location=NOT+baltimore`
+
+      *: wildcard character for partial matching; example: `name=carruthe*`'
       formats ['json', 'xml']
-      meta :message => "Returns results of the query in q or fuzzy_q"
+      error :code => 400, :desc => "Bad Request"
+      example '{ error : "Invalid Query Syntax" }'
+      example '
+      {
+        "meta":  {
+          "totalResults": 1,
+          "resultsPerPage": 10
+        },
+        "providers":  [
+          {
+            "npi": "[NPI]",
+            "last_name_legal_name": "[LAST NAME]",
+            "first_name": "[FIRST NAME]",
+            "gender_code": "F",
+            "mailing_address": {
+              "first_line": "[ADDRESS]",
+              "second_line": "[ADDRESS]",
+              "city": "[CITY]",
+              "state": "[STATE]",
+              "postal_code": "[ZIP]",
+              "country_code": "[COUNTRY]",
+              "telephone_number": "[PHONE NUMBER]"
+            },
+            "practice_location_address": {
+              "first_line": "[ADDRESS]",
+              "second_line": "[ADDRESS]",
+              "city": "[CITY]",
+              "state": "[STATE]",
+              "postal_code": "[ZIP]",
+              "country_code": "[COUNTRY]",
+              "telephone_number": "[PHONE NUMBER]"
+            },
+            "taxonomy_licenses": [
+              {
+                "code": "[CODE]",
+                "taxonomy_code": {
+                  "code": "[CODE]",
+                  "taxonomy_type": "[TYPE]",
+                  "classification": "[CLASSIFICATION]"
+                }
+              }
+            ]
+          }
+        ]
+      }'
+      # Parameter descriptions at https://github.com/Apipie/apipie-rails#id17
+      param :q,             String,   :desc => "Specifies a search on a generic search query that searches across all available fields (NPI, name, location, specialization, organization name). "
+      param :offset,        :number,  :desc => "Defaults to 0. Enables paginated search."
+      param :name,          String,   :desc => "Specifies a search on the name of a provider."
+      param :location,      String,   :desc => "Specifies a search on the location, specified as a state or city."
+      param :taxonomy,      String,   :desc => "Specifies a search on the taxonomy, or speciality, associated with a provider."
+      param :organization,  String,   :desc => "Specifies a search on the organization associated with a provider."
+      param :npi,           String,   :desc => "Specifies a search on a National Provider Identifier."
+      param :latitude,      :number,   :desc => "Provided by geolocation."
+      param :longitude,     :number,   :desc => "Provided by geolocation."
+      param :radius,        :number,  :desc => "Specifies a search for providers within a specified radius in miles of the provided latitude and longitude or geo_zip. If no radius is provided, a default of 1 mile is used."
+      param :geo_zip,       String,   :desc => "A zip code to search against."
       def index
 
         # Basic search functionality
@@ -93,8 +143,57 @@ module Api
 
       end
 
-      api :GET, '/providers/:id'
+      api :GET, '/providers/:id', "Returns a single provider record."
+      formats ['json', 'xml']
       param :id, :number
+      example '
+      {
+        provider: {
+          "npi": "[NPI]",
+          "last_name_legal_name": "[LAST NAME]",
+          "first_name": "[FIRST NAME]",
+          "gender_code": "F",
+          "mailing_address": {
+            "first_line": "[ADDRESS]",
+            "second_line": "[ADDRESS]",
+            "city": "[CITY]",
+            "state": "[STATE]",
+            "postal_code": "[ZIP]",
+            "country_code": "[COUNTRY]",
+            "telephone_number": "[PHONE NUMBER]"
+          },
+          "practice_location_address": {
+            "first_line": "[ADDRESS]",
+            "second_line": "[ADDRESS]",
+            "city": "[CITY]",
+            "state": "[STATE]",
+            "postal_code": "[ZIP]",
+            "country_code": "[COUNTRY]",
+            "telephone_number": "[PHONE NUMBER]"
+          },
+          "taxonomy_licenses": [
+            {
+              "code": "[CODE]",
+              "taxonomy_code": {
+                "code": "[CODE]",
+                "taxonomy_type": "[TYPE]",
+                "classification": "[CLASSIFICATION]"
+              }
+            }
+          ],
+          "taxonomy_groups": ".",
+          "organizations": [
+            {
+              ...
+            }
+          ],
+          "electronic_services": [
+            {
+              ...
+            }
+          ]
+        }
+      }'
       def show
         provider = Provider.find(params[:id])
         respond_to do |format|

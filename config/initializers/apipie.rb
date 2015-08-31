@@ -1,6 +1,6 @@
 Apipie.configure do |config|
   config.app_name                 = "Medirectory"
-  config.api_base_url             = "/docs/api/v1"
+  config.api_base_url             = "/api/v1"
   config.doc_base_url             = "/docs/api"
   # set true/false for default validation
   config.validate                 = false

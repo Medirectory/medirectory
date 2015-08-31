@@ -7,7 +7,82 @@ module Api
            {providers: {include: {taxonomy_licenses: {include: :taxonomy_code}}}} ]
       RESULTS_PER_PAGE = 10
 
-      api :GET, '/organizations'
+      api :GET, '/organizations', "Returns paginated results of a user-submitted search query. Will return all results if no parameters specified."
+      description 'All parameters are optional, and can be combined to create more complex searches. If multiple search parameters are supplied they are combined using an implicit AND operator. Any parameter that accepts a string can use the following special search terms:
+
+      OR: return results that match either term; example: `location=chicago+OR+miami`
+
+      AND: return results that match both terms; example: `name=lee+AND+johnathan`
+
+      NOT: return results that do not match the term; example: `location=NOT+baltimore`
+
+      *: wildcard character for partial matching; example: `name=carruthe*`'
+      formats ['json', 'xml']
+      error :code => 400, :desc => "Bad Request"
+      example '{ error : "Invalid Query Syntax" }'
+      example '
+      {
+        "meta":  {
+          "totalResults": 1,
+          "resultsPerPage": 10
+        },
+        "organizations":  [
+          {
+            "npi": "[NPI]",
+            "organization_name_legal_business_name": "[LEGAL NAME]",
+            "other_organization_name": "[OTHER NAME]",
+            "authorized_official_last_name": "[LAST NAME]",
+            "authorized_official_first_name": "[FIRST NAME]",
+            "authorized_official_telephone_number": "[PHONE NUMBER]",
+            "mailing_address": {
+              "first_line": "[ADDRESS]",
+              "second_line": "[ADDRESS]",
+              "city": "[CITY]",
+              "state": "[STATE]",
+              "postal_code": "[ZIP]",
+              "country_code": "[COUNTRY]",
+              "telephone_number": "[PHONE NUMBER]"
+            },
+            "practice_location_address": {
+              "first_line": "[ADDRESS]",
+              "second_line": "[ADDRESS]",
+              "city": "[CITY]",
+              "state": "[STATE]",
+              "postal_code": "[ZIP]",
+              "country_code": "[COUNTRY]",
+              "telephone_number": "[PHONE NUMBER]"
+            },
+            "other_provider_identifiers": [
+              {
+                "identifier": "[IDENTIFIER]",
+                "identifier_type_code": "[CODE]",
+                "identifier_state": "[STATE]"
+              }
+            ]
+            "taxonomy_licenses": [
+              {
+                "code": "[CODE]",
+                "taxonomy_code": {
+                  "code": "[CODE]",
+                  "taxonomy_type": "[TYPE]",
+                  "classification": "[CLASSIFICATION]"
+                }
+              }
+            ]
+          }
+        ]
+      }'
+      param :q,             String,   :desc => "Specifies a search on a generic search query that searches across all available fields (NPI, name, location, specialization, provider name). "
+      param :offset,        :number,  :desc => "Defaults to 0. Enables paginated search."
+      param :name,          String,   :desc => "Specifies a search on the name of an organization."
+      param :authorized_official,  String,   :desc => "Specifies a search on the authorized official of an organization."
+      param :location,      String,   :desc => "Specifies a search on the location, specified as a state or city."
+      param :taxonomy,      String,   :desc => "Specifies a search on the taxonomy, or speciality, associated with an organization."
+      param :npi,           String,   :desc => "Specifies a search on a National Provider Identifier."
+      param :latitude,      :number,   :desc => "Provided by geolocation."
+      param :longitude,     :number,   :desc => "Provided by geolocation."
+      param :radius,        :number,  :desc => "Specifies a search for organizations within a specified radius in miles of the provided latitude and longitude or geo_zip. If no radius is provided, a default of 1 mile is used."
+      param :geo_zip,       String,   :desc => "A zip code to search against."
       def index
         # Basic search functionality
         organizations = if params[:q]
@@ -61,8 +136,57 @@ module Api
         end
       end
 
-      api :GET, '/organizations/:id'
+      api :GET, '/organizations/:id', "Returns a single organization record."
+      formats ['json', 'xml']
       param :id, :number
+      example '
+      {
+        "organization":  [
+          {
+            "npi": "[NPI]",
+            "organization_name_legal_business_name": "[LEGAL NAME]",
+            "other_organization_name": "[OTHER NAME]",
+            "authorized_official_last_name": "[LAST NAME]",
+            "authorized_official_first_name": "[FIRST NAME]",
+            "authorized_official_telephone_number": "[PHONE NUMBER]",
+            "mailing_address": {
+              "first_line": "[ADDRESS]",
+              "second_line": "[ADDRESS]",
+              "city": "[CITY]",
+              "state": "[STATE]",
+              "postal_code": "[ZIP]",
+              "country_code": "[COUNTRY]",
+              "telephone_number": "[PHONE NUMBER]"
+            },
+            "practice_location_address": {
+              "first_line": "[ADDRESS]",
+              "second_line": "[ADDRESS]",
+              "city": "[CITY]",
+              "state": "[STATE]",
+              "postal_code": "[ZIP]",
+              "country_code": "[COUNTRY]",
+              "telephone_number": "[PHONE NUMBER]"
+            },
+            "other_provider_identifiers": [
+              {
+                "identifier": "[IDENTIFIER]",
+                "identifier_type_code": "[CODE]",
+                "identifier_state": "[STATE]"
+              }
+            ]
+            "taxonomy_licenses": [
+              {
+                "code": "[CODE]",
+                "taxonomy_code": {
+                  "code": "[CODE]",
+                  "taxonomy_type": "[TYPE]",
+                  "classification": "[CLASSIFICATION]"
+                }
+              }
+            ]
+          }
+        ]
+      }'
       def show
         organization = Organization.find(params[:id])
         respond_to do |format|
