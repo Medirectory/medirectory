@@ -42,6 +42,16 @@ class PractitionersControllerTest < ActionController::TestCase
     assert_equal 6, JSON.parse(response.body)['entry'].length
   end
 
+  test "should return a single fhir prov with id" do
+    get :index, {_format: :json, _id: "1891031548"}
+    assert_equal 1, JSON.parse(response.body)['entry'].length
+  end
+
+  test "should return a no fhir prov (non exist)" do
+    get :index, {_format: :json, _id: "0091031548"}
+    assert_equal 0, JSON.parse(response.body)['entry'].length
+  end
+
   test "should return the right number of fhir provs with a name" do
 
     get :index, {_format: :json, name:"T"}

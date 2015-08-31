@@ -5,20 +5,21 @@ module Fhir
         family: :last_name_legal_name
       }
       LOOKUP_TOKENS = {
-        #_id: :npi
+        _id: :npi
       }
       T = Provider.arel_table
 
       def self.parse_matches(name, split_values)
         to_return = nil
+        match_values = split_values.map {|value| '%'+value.to_s+'%'}
         case name
         when "name"
-          to_return = T[:first_name].matches_any(split_values).or(
-            T[:last_name_legal_name].matches_any(split_values)
+          to_return = T[:first_name].matches_any(match_values).or(
+            T[:last_name_legal_name].matches_any(match_values)
             )
         else
-          to_return = T[LOOKUP_TOKENS[name.intern].intern].eq_any(split_values) if LOOKUP_TOKENS.has_key?(name.intern)
-          to_return = T[LOOKUP_STRINGS[name.intern].intern].matches_any(split_values) if LOOKUP_STRINGS.has_key?(name.intern)
+          to_return = T[LOOKUP_STRINGS[name.intern]].matches_any(match_values) if LOOKUP_STRINGS[name.intern]
+          to_return = T[LOOKUP_TOKENS[name.intern]].eq_any(split_values) if LOOKUP_TOKENS[name.intern]
         end
         to_return
       end
@@ -31,8 +32,8 @@ module Fhir
             T[:last_name_legal_name].eq_any(split_values)
             )
         else
-          to_return = T[LOOKUP_TOKENS[name.intern].intern].eq_any(split_values) if LOOKUP_TOKENS.has_key?(name.intern)
-          to_return = T[LOOKUP_STRINGS[name.intern].intern].eq_any(split_values) if LOOKUP_STRINGS.has_key?(name.intern)
+          to_return = T[LOOKUP_STRINGS[name.intern]].eq_any(split_values) if LOOKUP_STRINGS[name.intern]
+          to_return = T[LOOKUP_TOKENS[name.intern]].eq_any(split_values) if LOOKUP_TOKENS[name.intern]
         end
         to_return
       end
@@ -53,11 +54,11 @@ module Fhir
           end
         else
           if missing
-            to_return = T[LOOKUP_TOKENS[name.intern].intern].eq(nil) if LOOKUP_TOKENS.has_key?(name.intern)
-            to_return = T[LOOKUP_STRINGS[name.intern].intern].eq(nil) if LOOKUP_STRINGS.has_key?(name.intern)
+            to_return = T[LOOKUP_STRINGS[name.intern]].eq(nil) if LOOKUP_STRINGS[name.intern]
+            to_return = T[LOOKUP_TOKENS[name.intern]].eq(nil) if LOOKUP_TOKENS[name.intern]
           else
-            to_return = T[LOOKUP_TOKENS[name.intern].intern].not_eq(nil) if LOOKUP_TOKENS.has_key?(name.intern)
-            to_return = T[LOOKUP_STRINGS[name.intern].intern].not_eq(nil) if LOOKUP_STRINGS.has_key?(name.intern)
+            to_return = T[LOOKUP_STRINGS[name.intern]].not_eq(nil) if LOOKUP_STRINGS[name.intern]
+            to_return = T[LOOKUP_TOKENS[name.intern]].not_eq(nil) if LOOKUP_TOKENS[name.intern]
           end
 
         end

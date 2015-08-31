@@ -20,7 +20,6 @@ module Fhir
           queries << fhir_resource_parser.parse_missing_modifier(actual_name, missing)
         else
           # Just use base. Only handling strings at the moments, so partials (%)
-          split_values = split_values.map {|value| '%'+value.to_s+'%'}
           queries << fhir_resource_parser.parse_matches(actual_name, split_values)
         end
       end if all_params
