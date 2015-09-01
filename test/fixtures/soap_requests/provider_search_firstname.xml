@@ -1,0 +1,23 @@
+<soap-env:Envelope xmlns:soap-env="http://www.w3.org/2003/05/soap-envelope">
+   <soap-env:Body>
+      <dsml:batchRequest requestID="${=project.name}_${=testSuite.name}_${=testCase.name}_${=testStep.name}_${=request.name}_${=UUID.randomUUID()}" xmlns:dsml="urn:oasis:names:tc:DSML:2:0:core" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+         <dsml:searchRequest dn="ou=HcProfessional,${#Project#project.test.server.dsml.dn.base}" scope="singleLevel" derefAliases="derefFindingBaseObj">
+            <dsml:filter>
+            	<dsml:or>
+				<dsml:equalityMatch name="givenName">
+				   <dsml:value>Lesley</dsml:value>
+				</dsml:equalityMatch>
+				<dsml:equalityMatch name="givenName">
+				   <dsml:value>Lindsay</dsml:value>
+				</dsml:equalityMatch>
+               </dsml:or>
+               <dsml:equalityMatch name="Gender">
+                  <dsml:value>M</dsml:value>
+               </dsml:equalityMatch>
+            </dsml:filter>
+                <!--dsml:attributes>
+                </dsml:attributes-->
+         </dsml:searchRequest>
+      </dsml:batchRequest>
+   </soap-env:Body>
+</soap-env:Envelope>
