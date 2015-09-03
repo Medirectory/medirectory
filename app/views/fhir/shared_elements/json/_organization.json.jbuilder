@@ -1,9 +1,9 @@
 json.resourceType "Organization"
 json.identifier [nil] do
-  json.use(value: "official")
-  json.label(value: "NPI")
-  json.system(value: "https://nppes.cms.hhs.gov/NPPES/")
-  json.value(value: organization.npi)
+  json.use "official"
+  json.label "NPI"
+  json.system "https://nppes.cms.hhs.gov/NPPES/"
+  json.value organization.npi.to_s
 end
 
 json.name organization.organization_name_legal_business_name

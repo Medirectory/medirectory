@@ -4,7 +4,7 @@ json.identifier [nil] do
   json.use "official"
   json.label "NPI"
   json.system "https://nppes.cms.hhs.gov/NPPES/"
-  json.value provider.npi
+  json.value provider.npi.to_s
 end
 # Name
 json.name do
