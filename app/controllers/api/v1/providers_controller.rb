@@ -7,7 +7,7 @@ module Api
       RESULTS_PER_PAGE = 10
 
       # Method descriptions at https://github.com/Apipie/apipie-rails#id16
-      api :GET, '/providers', "Returns paginated results of a user-submitted search query. Will return all results if no parameters specified."
+      api :GET, 'api/v1/providers', "Returns paginated results of a user-submitted search query. Will return all results if no parameters specified."
       description 'All parameters are optional, and can be combined to create more complex searches. If multiple search parameters are supplied they are combined using an implicit AND operator. Any parameter that accepts a string can use the following special search terms:
 
       OR: return results that match either term; example: `location=chicago+OR+miami`
@@ -143,7 +143,7 @@ module Api
 
       end
 
-      api :GET, '/providers/:id', "Returns a single provider record."
+      api :GET, 'api/v1/providers/:id', "Returns a single provider record."
       formats ['json', 'xml']
       param :id, :number
       example '

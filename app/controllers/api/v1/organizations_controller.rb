@@ -7,7 +7,7 @@ module Api
            {providers: {include: {taxonomy_licenses: {include: :taxonomy_code}}}} ]
       RESULTS_PER_PAGE = 10
 
-      api :GET, '/organizations', "Returns paginated results of a user-submitted search query. Will return all results if no parameters specified."
+      api :GET, 'api/v1/organizations', "Returns paginated results of a user-submitted search query. Will return all results if no parameters specified."
       description 'All parameters are optional, and can be combined to create more complex searches. If multiple search parameters are supplied they are combined using an implicit AND operator. Any parameter that accepts a string can use the following special search terms:
 
       OR: return results that match either term; example: `location=chicago+OR+miami`
@@ -136,7 +136,7 @@ module Api
         end
       end
 
-      api :GET, '/organizations/:id', "Returns a single organization record."
+      api :GET, 'api/v1/organizations/:id', "Returns a single organization record."
       formats ['json', 'xml']
       param :id, :number
       example '

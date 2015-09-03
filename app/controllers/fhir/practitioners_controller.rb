@@ -6,6 +6,103 @@ module Fhir
          {taxonomy_licenses: :taxonomy_code}, :taxonomy_groups, :organizations ]
     RESULTS_PER_PAGE = 8
 
+    api :GET, 'fhir/practitioners', "Returns paginated results of a user-submitted search query. Will return all results (paginated) if no parameters specified."
+    description "All parameters are optional.  This api is meant to follow the FHIR format, and there is a corresponding conformance endpoint decribing this implementaiton and it's capabilities."
+    formats ['json', 'xml']
+    example '
+    {
+      "resourceType": "Bundle",
+      "title": "[SEARCH TITLE]",
+      "link": [{
+        "rel": "self",
+        "href": "[LINK]"
+      }, {
+        "rel": "first",
+        "href": "[LINK]"
+      }, {
+        "rel": "previous",
+        "href": "[LINK]"
+      }, {
+        "rel": "next",
+        "href": "[LINK]"
+      }, {
+        "rel": "last",
+        "href": "[LINK]"
+      }, {
+        "rel": "base",
+        "href": "[LINK]"
+      }],
+      "totalResults": [NUMBER],
+      "id": "[URI]",
+      "author": [{
+        "name": "Medirectory"
+      }],
+      "entry": [{
+        "title": "[PROV NAME]",
+        "id": "[URI]",
+        "updated": "[DATE]",
+        "published": "[DATE]]",
+        "author": [{
+          "name": "National Plan & Provider Enumeration System",
+          "uri": "https://nppes.cms.hhs.gov"
+        }],
+        "content": {
+          "resourceType": "Practitioner",
+          "identifier": [{
+            "use": "[USE TYPE]",
+            "label": "[ID TYPE]",
+            "system": "[ID SYSTEM]",
+            "value": "[ID VALUE]"
+          }],
+          "name": {
+            "use": "[USE TYPE]",
+            "text": "[NAME TO DISPLAY]",
+            "family": ["LAST_NAME"],
+            "given": ["[FIRST_NAME]", "[MIDDLE_NAME]"]
+          },
+          "telecom": [{
+            "system": "[SYSTEM TYPE]",
+            "value": "[ACCESS]",
+            "use": "[USE TYPE]"
+          }],
+          "address": {
+            "use": "[USE TYPE]",
+            "text": "[FULL ADDRESS]",
+            "line": ["[LINE1]", "[LINE2]", "..."],
+            "city": "[CITY]",
+            "state": "[STATE]",
+            "zip": "[ZIP]",
+            "country": "[COUNTRY]"
+          },
+          "gender": {
+            "coding": [{
+              "code": "[GENDER CODE/TOKEN]",
+              "display": "[DISPLAY FOR GENDER]"
+            }]
+          },
+          "organization": {
+            "display": "[ORG NAME]"
+          },
+          "specialty": [{
+            "coding": [{
+              "code": "[SPECIALTY CODE/TOKEN]",
+              "display": "[DISPLAY FOR SPECIALTY]"
+            }]
+          }],
+          "period": {
+            "start": "[DATE]"
+          }
+        }
+      }]
+    }'
+    param :_id,                   String,   :desc => "Search over unique id for practitioner."
+    param :_format,               String,  :desc => "Defaults to xml.  Choice of xml or json."
+    param :name,                  String,   :desc => "Specifies a search on the name of a practitioner. Matches any part of the first or last name."
+    param "name:exact".intern,    String,   :desc => "Specifies a search on the name of a practitioner. Must match first or last name exactly (includes case)."
+    param :given,                 String,   :desc => "Specifies a search on the first name of a practitioner. Matches any part of the first name."
+    param "given:exact".intern,   String,   :desc => "Specifies a search on the first name of a practitioner. Must match first name exactly (includes case)."
+    param :family,                String,   :desc => "Specifies a search on the last name of a practitioner. Matches any part of the last name."
+    param "family:exact".intern,  String,   :desc => "Specifies a search on the last name of a practitioner. Must match last name exactly (includes case)."
     def index
       # a number of queries in FHIR run off the "matches any part of"
       #  Except is ':exact' is appended
@@ -58,6 +155,59 @@ module Fhir
       end
     end
 
+    api :GET, 'fhir/practitioners/:id', "Returns a single organization record."
+    description "Returns an organization for the provided id"
+    formats ['json', 'xml']
+    example '
+    {
+      "resourceType": "Practitioner",
+      "identifier": [{
+        "use": "[USE TYPE]",
+        "label": "[ID TYPE]",
+        "system": "[ID SYSTEM]",
+        "value": "[ID VALUE]"
+      }],
+      "name": {
+        "use": "[USE TYPE]",
+        "text": "[NAME TO DISPLAY]",
+        "family": ["LAST_NAME"],
+        "given": ["[FIRST_NAME]", "[MIDDLE_NAME]"]
+      },
+      "telecom": [{
+        "system": "[SYSTEM TYPE]",
+        "value": "[ACCESS]",
+        "use": "[USE TYPE]"
+      }],
+      "address": {
+        "use": "[USE TYPE]",
+        "text": "[FULL ADDRESS]",
+        "line": ["[LINE1]", "[LINE2]", "..."],
+        "city": "[CITY]",
+        "state": "[STATE]",
+        "zip": "[ZIP]",
+        "country": "[COUNTRY]"
+      },
+      "gender": {
+        "coding": [{
+          "code": "[GENDER CODE/TOKEN]",
+          "display": "[DISPLAY FOR GENDER]"
+        }]
+      },
+      "organization": {
+        "display": "[ORG NAME]"
+      },
+      "specialty": [{
+        "coding": [{
+          "code": "[SPECIALTY CODE/TOKEN]",
+          "display": "[DISPLAY FOR SPECIALTY]"
+        }]
+      }],
+      "period": {
+        "start": "[DATE]"
+      }
+    }'
+    param :_format,               String,  :desc => "Defaults to xml.  Choice of xml or json."
+    param :id,                    String,  :desc => "ID for the practitioner resource."
     def show
       @provider = Provider.includes(LOAD_INCLUDES).find(params[:id])
       case params[:_format]

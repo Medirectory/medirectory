@@ -5,7 +5,82 @@ module Fhir
     LOAD_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
          {taxonomy_licenses: :taxonomy_code}, :taxonomy_groups, :providers ]
     RESULTS_PER_PAGE = 8
-
+    api :GET, 'fhir/organizations', "Returns paginated results of a user-submitted search query. Will return all results (paginated) if no parameters specified."
+    description "All parameters are optional.  This api is meant to follow the FHIR format, and there is a corresponding conformance endpoint decribing this implementaiton and it's capabilities."
+    formats ['json', 'xml']
+    example '
+    {
+      "resourceType": "Bundle",
+      "title": "[SEARCH TITLE]",
+      "link": [{
+        "rel": "self",
+        "href": "[LINK]"
+      }, {
+        "rel": "first",
+        "href": "[LINK]"
+      }, {
+        "rel": "previous",
+        "href": "[LINK]"
+      }, {
+        "rel": "next",
+        "href": "[LINK]"
+      }, {
+        "rel": "last",
+        "href": "[LINK]"
+      }, {
+        "rel": "base",
+        "href": "[LINK]"
+      }],
+      "totalResults": [NUMBER],
+      "id": "[URI]",
+      "author": [{
+        "name": "Medirectory"
+      }],
+      "entry": [{
+        "title": "[ORG NAME]",
+        "id": "[URI]",
+        "updated": "[DATE]",
+        "published": "[DATE]]",
+        "author": [{
+          "name": "National Plan & Provider Enumeration System",
+          "uri": "https://nppes.cms.hhs.gov"
+        }],
+        "content": {
+          "resourceType": "Organization",
+          "identifier": [{
+            "use": "[USE TYPE]",
+            "label": "[ID TYPE]",
+            "system": "[ID SYSTEM]",
+            "value": "[ID VALUE]"
+          }],
+          "name": "[NAME]",
+          "type": {
+            "coding": [{
+              "code": "[ORG CODE]",
+              "display": "[DISPLAY TEXT]"
+            }]
+          },
+          "telecom": [{
+            "system": "[SYSTEM TYPE]",
+            "value": "[ACCESS]",
+            "use": "[USE TYPE]"
+          }],
+          "address": [{
+            "use": "[USE TYPE]",
+            "text": "[FULL ADDRESS]",
+            "line": ["[LINE1]", "[LINE2]", "..."],
+            "city": "[CITY]",
+            "state": "[STATE]",
+            "zip": "[ZIP]",
+            "country": "[COUNTRY]"
+          }]
+        }
+      }]
+    }'
+    param :_id,                   String,   :desc => "Search over unique id for organization."
+    param :_format,               String,  :desc => "Defaults to xml.  Choice of xml or json."
+    param :name,                  String,   :desc => "Specifies a search on the name of an organization. Matches any part of the name."
+    param "name:exact".intern,    String,   :desc => "Specifies a search on the name of an organization. Must match name exactly (includes case)."
     def index
       # a number of queries in FHIR run off the "matches any part of"
       #  Except is ':exact' is appended
@@ -58,6 +133,42 @@ module Fhir
       end
     end
 
+    api :GET, 'fhir/organizations/:id', "Returns a single organization record."
+    description "Returns an organization for the provided id"
+    formats ['json', 'xml']
+    example '
+    {
+      "resourceType": "Organization",
+      "identifier": [{
+        "use": "[USE TYPE]",
+        "label": "[ID TYPE]",
+        "system": "[ID SYSTEM]",
+        "value": "[ID VALUE]"
+      }],
+      "name": "[NAME]",
+      "type": {
+        "coding": [{
+          "code": "[ORG CODE]",
+          "display": "[DISPLAY TEXT]"
+        }]
+      },
+      "telecom": [{
+        "system": "[SYSTEM TYPE]",
+        "value": "[ACCESS]",
+        "use": "[USE TYPE]"
+      }],
+      "address": [{
+        "use": "[USE TYPE]",
+        "text": "[FULL ADDRESS]",
+        "line": ["[LINE1]", "[LINE2]", "..."],
+        "city": "[CITY]",
+        "state": "[STATE]",
+        "zip": "[ZIP]",
+        "country": "[COUNTRY]"
+      }]
+    }'
+    param :_format,               String,  :desc => "Defaults to xml.  Choice of xml or json."
+    param :id,                    String,  :desc => "ID for the organization resource."
     def show
       @organization = Organization.includes(LOAD_INCLUDES).find(params[:id])
       case params[:_format]
