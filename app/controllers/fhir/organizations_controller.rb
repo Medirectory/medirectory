@@ -1,12 +1,11 @@
 require 'fhir/parser'
-require 'fhir/practitioner_parser'
+require 'fhir/organization_parser'
 module Fhir
-  class PractitionersController < ApplicationController
+  class OrganizationsController < ApplicationController
     LOAD_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
-         {taxonomy_licenses: :taxonomy_code}, :taxonomy_groups, :organizations ]
+         {taxonomy_licenses: :taxonomy_code}, :taxonomy_groups, :providers ]
     RESULTS_PER_PAGE = 8
-
-    api :GET, 'fhir/practitioners', "Returns paginated results of a user-submitted search query. Will return all results (paginated) if no parameters specified."
+    api :GET, 'fhir/organizations', "Returns paginated results of a user-submitted search query. Will return all results (paginated) if no parameters specified."
     description "All parameters are optional.  This api is meant to follow the FHIR format, and there is a corresponding conformance endpoint decribing this implementaiton and it's capabilities."
     formats ['json', 'xml']
     example '
@@ -38,7 +37,7 @@ module Fhir
         "name": "Medirectory"
       }],
       "entry": [{
-        "title": "[PROV NAME]",
+        "title": "[ORG NAME]",
         "id": "[URI]",
         "updated": "[DATE]",
         "published": "[DATE]]",
@@ -47,25 +46,26 @@ module Fhir
           "uri": "https://nppes.cms.hhs.gov"
         }],
         "content": {
-          "resourceType": "Practitioner",
+          "resourceType": "Organization",
           "identifier": [{
             "use": "[USE TYPE]",
             "label": "[ID TYPE]",
             "system": "[ID SYSTEM]",
             "value": "[ID VALUE]"
           }],
-          "name": {
-            "use": "[USE TYPE]",
-            "text": "[NAME TO DISPLAY]",
-            "family": ["LAST_NAME"],
-            "given": ["[FIRST_NAME]", "[MIDDLE_NAME]"]
+          "name": "[NAME]",
+          "type": {
+            "coding": [{
+              "code": "[ORG CODE]",
+              "display": "[DISPLAY TEXT]"
+            }]
           },
           "telecom": [{
             "system": "[SYSTEM TYPE]",
             "value": "[ACCESS]",
             "use": "[USE TYPE]"
           }],
-          "address": {
+          "address": [{
             "use": "[USE TYPE]",
             "text": "[FULL ADDRESS]",
             "line": ["[LINE1]", "[LINE2]", "..."],
@@ -73,36 +73,14 @@ module Fhir
             "state": "[STATE]",
             "zip": "[ZIP]",
             "country": "[COUNTRY]"
-          },
-          "gender": {
-            "coding": [{
-              "code": "[GENDER CODE/TOKEN]",
-              "display": "[DISPLAY FOR GENDER]"
-            }]
-          },
-          "organization": {
-            "display": "[ORG NAME]"
-          },
-          "specialty": [{
-            "coding": [{
-              "code": "[SPECIALTY CODE/TOKEN]",
-              "display": "[DISPLAY FOR SPECIALTY]"
-            }]
-          }],
-          "period": {
-            "start": "[DATE]"
-          }
+          }]
         }
       }]
     }'
-    param :_id,                   String,   :desc => "Search over unique id for practitioner."
+    param :_id,                   String,   :desc => "Search over unique id for organization."
     param :_format,               String,  :desc => "Defaults to xml.  Choice of xml or json."
-    param :name,                  String,   :desc => "Specifies a search on the name of a practitioner. Matches any part of the first or last name."
-    param "name:exact".intern,    String,   :desc => "Specifies a search on the name of a practitioner. Must match first or last name exactly (includes case)."
-    param :given,                 String,   :desc => "Specifies a search on the first name of a practitioner. Matches any part of the first name."
-    param "given:exact".intern,   String,   :desc => "Specifies a search on the first name of a practitioner. Must match first name exactly (includes case)."
-    param :family,                String,   :desc => "Specifies a search on the last name of a practitioner. Matches any part of the last name."
-    param "family:exact".intern,  String,   :desc => "Specifies a search on the last name of a practitioner. Must match last name exactly (includes case)."
+    param :name,                  String,   :desc => "Specifies a search on the name of an organization. Matches any part of the name."
+    param "name:exact".intern,    String,   :desc => "Specifies a search on the name of an organization. Must match name exactly (includes case)."
     def index
       # a number of queries in FHIR run off the "matches any part of"
       #  Except is ':exact' is appended
@@ -111,17 +89,17 @@ module Fhir
       #  If the same param appears twice (name=blah&name=bleh) it's an AND operation
       #  If a param contains a comma though (name=blah,bleh) it's an OR operation
       #    (this is only true if the comma is not preceded by a \)
-      queries = Fhir::Parser.parse_params_to_sql(request.original_url.split('?').second, Fhir::PractitionerParser)
-      providers = Provider.all
+      queries = Fhir::Parser.parse_params_to_sql(request.original_url.split('?').second, Fhir::OrganizationParser)
+      organizations = Organization.all
       queries.each do |query|
-        providers = providers.where(query) if query
+        organizations = organizations.where(query) if query
       end
 
-      providers = providers.order(:npi)
-      @total = providers.size
-      providers = providers.includes(LOAD_INCLUDES)
-      providers = providers.offset(params[:offset]).limit(RESULTS_PER_PAGE)
-      @providers = providers
+      organizations = organizations.order(:npi)
+      @total = organizations.size
+      organizations = organizations.includes(LOAD_INCLUDES)
+      organizations = organizations.offset(params[:offset]).limit(RESULTS_PER_PAGE)
+      @organizations = organizations
       @params = request.query_parameters
       original_offset = @params[:offset]
       offset = params[:offset].to_i || 0
@@ -155,30 +133,31 @@ module Fhir
       end
     end
 
-    api :GET, 'fhir/practitioners/:id', "Returns a single organization record."
+    api :GET, 'fhir/organizations/:id', "Returns a single organization record."
     description "Returns an organization for the provided id"
     formats ['json', 'xml']
     example '
     {
-      "resourceType": "Practitioner",
+      "resourceType": "Organization",
       "identifier": [{
         "use": "[USE TYPE]",
         "label": "[ID TYPE]",
         "system": "[ID SYSTEM]",
         "value": "[ID VALUE]"
       }],
-      "name": {
-        "use": "[USE TYPE]",
-        "text": "[NAME TO DISPLAY]",
-        "family": ["LAST_NAME"],
-        "given": ["[FIRST_NAME]", "[MIDDLE_NAME]"]
+      "name": "[NAME]",
+      "type": {
+        "coding": [{
+          "code": "[ORG CODE]",
+          "display": "[DISPLAY TEXT]"
+        }]
       },
       "telecom": [{
         "system": "[SYSTEM TYPE]",
         "value": "[ACCESS]",
         "use": "[USE TYPE]"
       }],
-      "address": {
+      "address": [{
         "use": "[USE TYPE]",
         "text": "[FULL ADDRESS]",
         "line": ["[LINE1]", "[LINE2]", "..."],
@@ -186,30 +165,12 @@ module Fhir
         "state": "[STATE]",
         "zip": "[ZIP]",
         "country": "[COUNTRY]"
-      },
-      "gender": {
-        "coding": [{
-          "code": "[GENDER CODE/TOKEN]",
-          "display": "[DISPLAY FOR GENDER]"
-        }]
-      },
-      "organization": {
-        "display": "[ORG NAME]"
-      },
-      "specialty": [{
-        "coding": [{
-          "code": "[SPECIALTY CODE/TOKEN]",
-          "display": "[DISPLAY FOR SPECIALTY]"
-        }]
-      }],
-      "period": {
-        "start": "[DATE]"
-      }
+      }]
     }'
     param :_format,               String,  :desc => "Defaults to xml.  Choice of xml or json."
-    param :id,                    String,  :desc => "ID for the practitioner resource."
+    param :id,                    String,  :desc => "ID for the organization resource."
     def show
-      @provider = Provider.includes(LOAD_INCLUDES).find(params[:id])
+      @organization = Organization.includes(LOAD_INCLUDES).find(params[:id])
       case params[:_format]
       when "json"
         render "show.json"

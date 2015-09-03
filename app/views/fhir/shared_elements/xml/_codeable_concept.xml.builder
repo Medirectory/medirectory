@@ -1,7 +1,7 @@
 codings.each do |coding|
   xml.coding do
-    xml << render(partial: "fhir/practitioners/xml/coding.xml.builder", 
-    locals: { 
+    xml << render(partial: "fhir/shared_elements/xml/coding.xml.builder", 
+    locals: {
       uri: coding[:uri],
       version: coding[:version],
       code: coding[:code],

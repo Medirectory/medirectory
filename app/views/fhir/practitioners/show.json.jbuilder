@@ -1,1 +1,1 @@
-json.partial! 'fhir/practitioners/json/practitioner', provider: @provider
+json.partial! 'fhir/shared_elements/json/practitioner', provider: @provider
