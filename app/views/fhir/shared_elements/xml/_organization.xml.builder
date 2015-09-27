@@ -21,7 +21,7 @@ xml.Organization(xmlns:"http://hl7.org/fhir") do
     { system: "fax", number: organization.practice_location_address.fax_number, period: nil }] if organization.practice_location_address
   telecoms.each do |locals|
     xml.telecom do
-      xml << render(partial: 'fhir/shared_elements/xml/contact.xml.builder', locals: locals)
+      xml << render(partial: 'fhir/shared_elements/xml/contact_point.xml.builder', locals: locals)
     end unless locals[:number].blank?
   end
 
@@ -38,7 +38,6 @@ xml.Organization(xmlns:"http://hl7.org/fhir") do
   #   <name><!-- 0..1 HumanName A name associated with the contact --></name>
   #   <telecom><!-- 0..* Contact Contact details (telephone, email, etc)  for a contact --></telecom>
   #   <address><!-- 0..1 Address Visiting or postal addresses for the contact --></address>
-  #   <gender><!-- 0..1 CodeableConcept Gender for administrative purposes --></gender>
   # </contact>
 
   # Possibly use the practice_location_address?

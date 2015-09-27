@@ -18,7 +18,7 @@ telecoms = telecoms + [{ system: "phone", number: organization.mailing_address.t
 telecoms = telecoms + [{ system: "phone", number: organization.practice_location_address.telephone_number, period: nil },
   { system: "fax", number: organization.practice_location_address.fax_number, period: nil }] if organization.practice_location_address
 json.telecom telecoms do |locals|
-    json.partial! 'fhir/shared_elements/json/contact.json.jbuilder', locals: locals unless locals[:number].blank?
+    json.partial! 'fhir/shared_elements/json/contact_point.json.jbuilder', locals: locals unless locals[:number].blank?
 end
 
 json.address [organization.practice_location_address, organization.mailing_address] do |address|
