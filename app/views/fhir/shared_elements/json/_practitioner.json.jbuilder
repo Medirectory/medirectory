@@ -19,10 +19,10 @@ json.name do
 end
 
 telecoms = []
-telecoms = telecoms + [{ system: "phone", number: provider.mailing_address.telephone_number, rank: nil, period: nil },
-  { system: "fax", number: provider.mailing_address.fax_number, rank: nil, period: nil }] if provider.mailing_address
-telecoms = telecoms + [{ system: "phone", number: provider.practice_location_address.telephone_number, rank: nil, period: nil },
-  { system: "fax", number: provider.practice_location_address.fax_number, rank: nil, period: nil }] if provider.practice_location_address
+telecoms = telecoms + [{ system: "phone", value: provider.mailing_address.telephone_number, rank: nil, period: nil },
+  { system: "fax", value: provider.mailing_address.fax_number, rank: nil, period: nil }] if provider.mailing_address
+telecoms = telecoms + [{ system: "phone", value: provider.practice_location_address.telephone_number, rank: nil, period: nil },
+  { system: "fax", value: provider.practice_location_address.fax_number, rank: nil, period: nil }] if provider.practice_location_address
 json.telecom telecoms do |locals|
   json.partial! 'fhir/shared_elements/json/contact_point.json.jbuilder', locals: locals unless locals[:number].blank?
 end
