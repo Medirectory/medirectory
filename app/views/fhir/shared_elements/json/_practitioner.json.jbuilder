@@ -32,7 +32,7 @@ end if provider.practice_location_address
 
 
 json.gender "male" if provider.gender_code == "M"
-josn.gender "female" if provider.gender_code == "F"
+json.gender "female" if provider.gender_code == "F"
 
 json.practitionerRole [nil] do
   json.specialty provider.taxonomy_licenses do |license|
