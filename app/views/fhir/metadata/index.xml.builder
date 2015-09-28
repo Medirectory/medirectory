@@ -1,21 +1,21 @@
 xml.Conformance(xmlns:"http://hl7.org/fhir") do
   xml.publisher(value: "MITRE")
-  xml.description(value: "Test implementation of the FHIR markup for our database")
-  xml.experimental(value: "true")
   xml.date(value: "2015-07-10T09:08:29.499-04:00")
+  xml.description(value: "Test implementation of the FHIR markup for our database")
+  # xml.experimental(value: "true")
+  xml.kind(value: "capability")
   xml.fhirVersion(value: "0.0.82")
-  xml.acceptUnknown(value: "false")
+  xml.acceptUnknown(value: "no")
   xml.format(value: "xml")
   xml.format(value: "json")
   xml.rest do
     xml.mode(value: "server")
-    xml.documentation(value: "Only implements practitioners")
     xml.resource do
       xml.type(value: "Practitioner")
-      xml.operation do
+      xml.interaction do
         xml.code(value: "read")
       end
-      xml.operation do
+      xml.interaction do
         xml.code(value: "search-type")
         xml.documentation(value: "No search criteria leads to all Practitioners beings returned")
       end
@@ -42,10 +42,10 @@ xml.Conformance(xmlns:"http://hl7.org/fhir") do
     end
     xml.resource do
       xml.type(value: "Organization")
-      xml.operation do
+      xml.interaction do
         xml.code(value: "read")
       end
-      xml.operation do
+      xml.interaction do
         xml.code(value: "search-type")
         xml.documentation(value: "No search criteria leads to all organizations beings returned")
       end
