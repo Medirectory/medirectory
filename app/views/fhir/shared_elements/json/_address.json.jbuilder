@@ -7,5 +7,5 @@ lines << address.second_line if address.second_line
 json.line lines
 json.city address.city
 json.state address.state
-json.zip address.postal_code
+json.postalCode address.postal_code
 json.country address.country_code

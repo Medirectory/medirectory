@@ -1,17 +1,16 @@
 xml.Organization(xmlns:"http://hl7.org/fhir") do
   xml.identifier do
     xml.use(value: "official")
-    xml.label(value: "NPI")
     xml.system(value: "https://nppes.cms.hhs.gov/NPPES/")
     xml.value(value: organization.npi)
   end
 
   xml.name(value: organization.organization_name_legal_business_name)
   # Assuming the only orgs are providers (for now)
-  xml.type do
-    xml << render(partial: 'fhir/shared_elements/xml/codeable_concept.xml.builder',
-      locals: {codings: [{code: "prov", display: "Healthcare Provider"}], text: nil})
-  end
+  # xml.type do
+  #   xml << render(partial: 'fhir/shared_elements/xml/codeable_concept.xml.builder',
+  #     locals: {codings: [{code: "prov", display: "Healthcare Provider"}], text: nil})
+  # end
 
 
   telecoms = []

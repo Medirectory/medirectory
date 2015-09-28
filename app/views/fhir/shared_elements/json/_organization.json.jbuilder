@@ -7,10 +7,10 @@ end
 
 json.name organization.organization_name_legal_business_name
 # Assuming the only orgs are providers (for now)
-json.type do
-  json.partial! 'fhir/shared_elements/json/codeable_concept.json.jbuilder',
-    locals: {codings: [{code: "prov", display: "Healthcare Provider"}], text: nil}
-end
+# json.type do
+#   json.partial! 'fhir/shared_elements/json/codeable_concept.json.jbuilder',
+#     locals: {codings: [{code: "prov", display: "Healthcare Provider"}], text: nil}
+# end
 telecoms = []
 telecoms = telecoms + [{ system: "phone", value: organization.mailing_address.telephone_number, rank: nil, period: nil },
   { system: "fax", value: organization.mailing_address.fax_number, rank: nil, period: nil }] if organization.mailing_address
