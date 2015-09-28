@@ -1,7 +1,6 @@
 xml.Practitioner(xmlns:"http://hl7.org/fhir") do
   xml.identifier do
     xml.use(value: "official")
-    xml.label(value: "NPI")
     xml.system(value: "https://nppes.cms.hhs.gov/NPPES/")
     xml.value(value: provider.npi)
   end
@@ -31,15 +30,8 @@ xml.Practitioner(xmlns:"http://hl7.org/fhir") do
     xml << render(partial: "fhir/shared_elements/xml/address.xml.builder", locals: {address: provider.practice_location_address})
   end if provider.practice_location_address
 
-  xml.gender do
-    xml << render(partial: "fhir/shared_elements/xml/codeable_concept.xml.builder",
-      locals: { codings: [{code: provider.gender_code, display: provider.gender_code}], text: nil})
-  end
-
-  xml.organization do
-    xml << render(partial: "fhir/shared_elements/xml/resource.xml.builder",
-      locals: {reference: nil, display: (provider.organizations.first.other_organization_name ?  provider.organizations.first.other_organization_name : provider.organizations.first.organization_name_legal_business_name)})
-  end if provider.organizations.first
+  xml.gender(value: "male") if provider.gender_code == "M"
+  xml.gender(value: "female") if provider.gender_code == "F"
 
   xml.practitionerRole do
     provider.taxonomy_licenses.each do |license|
@@ -48,16 +40,6 @@ xml.Practitioner(xmlns:"http://hl7.org/fhir") do
         xml << render(partial: "fhir/shared_elements/xml/codeable_concept.xml.builder",
           locals: {codings: [{code:license.license_number, display: license.taxonomy_code.classification.to_s + specialization.to_s}], text: nil})
       end
-    end
-  end
-
-  xml.period do
-    if provider.npi_reactivation_date
-      xml << render(partial: "fhir/shared_elements/xml/period.xml.builder",
-        locals: {startDate: provider.npi_reactivation_date, endDate: nil})
-    else
-      xml << render(partial: "fhir/shared_elements/xml/period.xml.builder",
-        locals: {startDate: provider.enumeration_date, endDate: provider.npi_deactivation_date})
     end
   end
 
