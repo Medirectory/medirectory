@@ -183,7 +183,6 @@ func init() {
 	db, _ = sql.Open("postgres", "dbname="+dbFlag+" sslmode=disable")
 
 	if updateFlag {
-		fmt.Println("performing update...")
 		providerTable = "t_" + providerTable
 		organizationTable = "t_" + organizationTable
 		addressTable = "t_" + addressTable
@@ -301,7 +300,6 @@ func fetchId(npi string, entityType string) string {
 		//err = db.QueryRow("select case when exists (select entity_id from provider_identifiers where identifier = $1 and entity_type = $2) then (select entity_id from provider_identifiers where identifier = $1 and entity_type = $2) else nextval($3) end as entity_type;", npi, entityTypeStr, seqName).Scan(&id)
 	}
 	if err != nil {
-		fmt.Println("here: ", npi)
 		log.Fatal(err)
 	}
 	return strconv.Itoa(id)
@@ -361,7 +359,7 @@ func insert(recordMap map[string]string, stmts map[string]*sql.Stmt) {
 		recordMap["entity_id"] = fetchId("", recordMap["entity_type_code"])
 	}
 	//recordMap["entity_id"] = strconv.Itoa(fetchId(recordMap["npi"], recordMap["entity_type_code"]))
-	fmt.Println("inside insert: ", recordMap["npi"], recordMap["entity_type_code"], recordMap["entity_id"])
+
 	
 	if recordMap["entity_type_code"] == "1" {
 		insertData(providerHeaders[:], recordMap, stmts["providers"], 1, nil)
@@ -742,5 +740,8 @@ func update() {
 	logIfFatal(err)
 	_, err = db.Exec("DROP TABLE t_deleted_npis")
 	logIfFatal(err)
+
+	fmt.Println("Finished updating", time.Now())
+
 
 }
