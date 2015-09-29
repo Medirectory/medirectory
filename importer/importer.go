@@ -183,6 +183,7 @@ func init() {
 	db, _ = sql.Open("postgres", "dbname="+dbFlag+" sslmode=disable")
 
 	if updateFlag {
+		fmt.Println("performing update...")
 		providerTable = "t_" + providerTable
 		organizationTable = "t_" + organizationTable
 		addressTable = "t_" + addressTable
@@ -274,10 +275,11 @@ func underscore(string string) string {
 	return strings.Replace(string, " ", "_", -1)
 }
 
-func fetchId(npi string, entityType string) int {
+func fetchId(npi string, entityType string) string {
 	var entityTypeStr string
 	var seqName string
 	var id int
+	var err error
 
 	switch entityType {
 	case "1":
@@ -288,16 +290,21 @@ func fetchId(npi string, entityType string) int {
 		entityTypeStr = "Organization"
 		seqName = "organizations_id_seq"
 		break
+	case "":
+		//fmt.Println("empty entity_type")
+		return ""
 	}
-	if entityTypeStr == "" {
-		return 0
+	if npi == "" {
+		err = db.QueryRow("select nextval('" + seqName + "')").Scan(&id)
+	} else {
+		err = db.QueryRow("with entity_id_query as (select entity_id, 1 as id_exists from provider_identifiers where identifier = $1 and entity_type = $2 limit 1) select case when exists (select id_exists from entity_id_query) then (select entity_id from entity_id_query) else nextval($3) end as entity_id", npi, entityTypeStr, seqName).Scan(&id)
+		//err = db.QueryRow("select case when exists (select entity_id from provider_identifiers where identifier = $1 and entity_type = $2) then (select entity_id from provider_identifiers where identifier = $1 and entity_type = $2) else nextval($3) end as entity_type;", npi, entityTypeStr, seqName).Scan(&id)
 	}
-
-	err := db.QueryRow("select case when exists (select entity_id from provider_identifiers where identifier = $1 and entity_type = $2) then (select entity_id from provider_identifiers where identifier = $1 and entity_type = $2) else nextval($3) end as entity_type;", npi, entityTypeStr, seqName).Scan(&id)
 	if err != nil {
+		fmt.Println("here: ", npi)
 		log.Fatal(err)
 	}
-	return id
+	return strconv.Itoa(id)
 }
 
 // notAllNull feels hacky, but should allow us to remove completely null values from the inserts
@@ -340,19 +347,22 @@ func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt, r
 }
 
 func insert(recordMap map[string]string, stmts map[string]*sql.Stmt) {
-	/*
+	
 	if updateFlag {
-		id, exists := checkForNpi(recordMap["npi"])
+		/*id, exists := checkForNpi(recordMap["npi"])
 		if exists {
 			recordMap["entity_id"] = strconv.Itoa(id)
 		} else {
 			recordMap["entity_id"] = fetchId(recordMap["entity_type_code"])
 		}
+		*/
+		recordMap["entity_id"] = fetchId(recordMap["npi"], recordMap["entity_type_code"])
 	} else {
-		recordMap["entity_id"] = fetchId(recordMap["entity_type_code"])
-	}*/
-	recordMap["entity_id"] = strconv.Itoa(fetchId(recordMap["npi"], recordMap["entity_type_code"]))
-
+		recordMap["entity_id"] = fetchId("", recordMap["entity_type_code"])
+	}
+	//recordMap["entity_id"] = strconv.Itoa(fetchId(recordMap["npi"], recordMap["entity_type_code"]))
+	fmt.Println("inside insert: ", recordMap["npi"], recordMap["entity_type_code"], recordMap["entity_id"])
+	
 	if recordMap["entity_type_code"] == "1" {
 		insertData(providerHeaders[:], recordMap, stmts["providers"], 1, nil)
 		recordMap["entity_type"] = "Provider"
@@ -571,7 +581,7 @@ func update() {
 										telephone_number = t.telephone_number,
 										fax_number = t.fax_number
 										FROM t_addresses t
-										WHERE entity_id = t.entity_id AND entity_type = t.entity_type AND type = 'MailingAddress'`)
+										WHERE addresses.entity_id = t.entity_id AND addresses.entity_type = t.entity_type AND addresses.type = 'MailingAddress'`)
 	logIfFatal(err)
 	_, err = db.Exec(`UPDATE addresses
 										SET first_line = t.first_line,
@@ -583,7 +593,7 @@ func update() {
 										telephone_number = t.telephone_number,
 										fax_number = t.fax_number
 										FROM t_addresses t
-										WHERE entity_id = t.entity_id AND entity_type = t.entity_type AND type = 'PracticeLocationAddress'`)
+										WHERE addresses.entity_id = t.entity_id AND addresses.entity_type = t.entity_type AND addresses.type = 'PracticeLocationAddress'`)
 	logIfFatal(err)
 	_, err = db.Exec(`INSERT INTO addresses
 										(id,
@@ -594,7 +604,7 @@ func update() {
 										state,
 										postal_code,
 										country_code,
-										telephone_number
+										telephone_number,
 										fax_number,
 										entity_id,
 										entity_type)
@@ -612,8 +622,8 @@ func update() {
 										t.entity_id,
 										t.entity_type
 									FROM t_addresses t
-									LEFT OUTER JOIN addresses on (entity_id = t.entity_id AND entity_type = t.entity_type)
-									WHERE t.type = 'MailingAddress' AND entity_id IS NULL`)
+									LEFT OUTER JOIN addresses on (addresses.entity_id = t.entity_id AND addresses.entity_type = t.entity_type)
+									WHERE t.type = 'MailingAddress' AND addresses.entity_id IS NULL`)
 	logIfFatal(err)
 	_, err = db.Exec(`INSERT INTO addresses
 										(id,
@@ -624,7 +634,7 @@ func update() {
 										state,
 										postal_code,
 										country_code,
-										telephone_number
+										telephone_number,
 										fax_number,
 										entity_id,
 										entity_type)
@@ -642,8 +652,8 @@ func update() {
 										t.entity_id,
 										t.entity_type
 									FROM t_addresses t
-									LEFT OUTER JOIN addresses on (entity_id = t.entity_id AND entity_type = t.entity_type)
-									WHERE t.type = 'PracticeLocationAddress' AND entity_id IS NULL`)
+									LEFT OUTER JOIN addresses on (addresses.entity_id = t.entity_id AND addresses.entity_type = t.entity_type)
+									WHERE t.type = 'PracticeLocationAddress' AND addresses.entity_id IS NULL`)
 	logIfFatal(err)
 
 	_, err = db.Exec("DELETE FROM provider_identifiers WHERE entity_id IN (SELECT entity_id FROM t_provider_identifiers WHERE entity_type = 'Provider') AND entity_type = 'Provider'")
@@ -716,6 +726,21 @@ func update() {
 	_, err = db.Exec("DELETE FROM taxonomy_groups WHERE entity_id IN (SELECT entity_id FROM t_deleted_npis WHERE entity_type = 'Provider') AND entity_type = 'Provider'")
 	logIfFatal(err)
 	_, err = db.Exec("DELETE FROM taxonomy_groups WHERE entity_id IN (SELECT entity_id FROM t_deleted_npis WHERE entity_type = 'Organization') AND entity_type = 'Organization'")
+	logIfFatal(err)
+
+	_, err = db.Exec("DROP TABLE t_providers")
+	logIfFatal(err)
+	_, err = db.Exec("DROP TABLE t_organizations")
+	logIfFatal(err)
+	_, err = db.Exec("DROP TABLE t_addresses")
+	logIfFatal(err)
+	_, err = db.Exec("DROP TABLE t_provider_identifiers")
+	logIfFatal(err)
+	_, err = db.Exec("DROP TABLE t_taxonomy_licenses")
+	logIfFatal(err)
+	_, err = db.Exec("DROP TABLE t_taxonomy_groups")
+	logIfFatal(err)
+	_, err = db.Exec("DROP TABLE t_deleted_npis")
 	logIfFatal(err)
 
 }

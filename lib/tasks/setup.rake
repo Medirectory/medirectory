@@ -163,7 +163,7 @@ namespace :medirectory do
   desc 'Import NPPES data file into database as an update'
   task :import_update, [:file] => :environment do |task, args|
     db_name = Rails.configuration.database_configuration[ENV['RAILS_ENV']]["database"]
-    exec "go run importer/importer.go --file=#{args[:file]} --db=#{db_name}"
+    exec "go run importer/importer.go --update --file=#{args[:file]} --db=#{db_name}"
   end
 
 end
