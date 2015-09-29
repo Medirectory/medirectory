@@ -12,41 +12,30 @@ module Fhir
     example '
     {
       "resourceType": "Bundle",
-      "title": "[SEARCH TITLE]",
+      "type": "searchset",
+      "total": [NUMBER],
       "link": [{
-        "rel": "self",
-        "href": "[LINK]"
+        "relation": "self",
+        "url": "[LINK]"
       }, {
-        "rel": "first",
-        "href": "[LINK]"
+        "relation": "first",
+        "url": "[LINK]"
       }, {
-        "rel": "previous",
-        "href": "[LINK]"
+        "relation": "previous",
+        "url": "[LINK]"
       }, {
-        "rel": "next",
-        "href": "[LINK]"
+        "relation": "next",
+        "url": "[LINK]"
       }, {
-        "rel": "last",
-        "href": "[LINK]"
+        "relation": "last",
+        "url": "[LINK]"
       }, {
-        "rel": "base",
-        "href": "[LINK]"
-      }],
-      "totalResults": [NUMBER],
-      "id": "[URI]",
-      "author": [{
-        "name": "Medirectory"
+        "relation": "base",
+        "url": "[LINK]"
       }],
       "entry": [{
-        "title": "[PROV NAME]",
-        "id": "[URI]",
-        "updated": "[DATE]",
-        "published": "[DATE]]",
-        "author": [{
-          "name": "National Plan & Provider Enumeration System",
-          "uri": "https://nppes.cms.hhs.gov"
-        }],
-        "content": {
+        "fullUrl": "[URL]",
+        "resource": {
           "resourceType": "Practitioner",
           "identifier": [{
             "use": "[USE TYPE]",
@@ -74,24 +63,18 @@ module Fhir
             "zip": "[ZIP]",
             "country": "[COUNTRY]"
           },
-          "gender": {
-            "coding": [{
-              "code": "[GENDER CODE/TOKEN]",
-              "display": "[DISPLAY FOR GENDER]"
-            }]
-          },
+          "gender": "[GENDER]",
           "organization": {
             "display": "[ORG NAME]"
           },
-          "specialty": [{
-            "coding": [{
-              "code": "[SPECIALTY CODE/TOKEN]",
-              "display": "[DISPLAY FOR SPECIALTY]"
+          "practitionerRole": [{
+            "specialty": [{
+              "coding": [{
+                "code": "[SPECIALTY CODE/TOKEN]",
+                "display": "[DISPLAY FOR SPECIALTY]"
+              }]
             }]
-          }],
-          "period": {
-            "start": "[DATE]"
-          }
+          }]
         }
       }]
     }'
@@ -187,24 +170,18 @@ module Fhir
         "zip": "[ZIP]",
         "country": "[COUNTRY]"
       },
-      "gender": {
-        "coding": [{
-          "code": "[GENDER CODE/TOKEN]",
-          "display": "[DISPLAY FOR GENDER]"
-        }]
-      },
+      "gender": "[GENDER]",
       "organization": {
         "display": "[ORG NAME]"
       },
-      "specialty": [{
-        "coding": [{
-          "code": "[SPECIALTY CODE/TOKEN]",
-          "display": "[DISPLAY FOR SPECIALTY]"
+      "practitionerRole": [{
+        "specialty": [{
+          "coding": [{
+            "code": "[SPECIALTY CODE/TOKEN]",
+            "display": "[DISPLAY FOR SPECIALTY]"
+          }]
         }]
-      }],
-      "period": {
-        "start": "[DATE]"
-      }
+      }]
     }'
     param :_format,               String,  :desc => "Defaults to xml.  Choice of xml or json."
     param :id,                    String,  :desc => "ID for the practitioner resource."
