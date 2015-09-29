@@ -52,10 +52,18 @@ class PractitionersControllerTest < ActionController::TestCase
     assert_equal 0, JSON.parse(response.body)['entry'].length
   end
 
-  test "should return the right number of fhir provs with a name" do
+  test "should return the right number of fhir provs with a name that matches anything to the left only" do
+    get :index, {_format: :json, "given" => "W"}
+    assert_equal 1, JSON.parse(response.body)['entry'].length
+  end
 
-    get :index, {_format: :json, name:"T"}
+  test "should return the right number of fhir provs with a name that matches anything containing that string" do
+    get :index, {_format: :json, "given:contains" => "W"}
     assert_equal 2, JSON.parse(response.body)['entry'].length
   end
 
+  test "should return the no fhir provs since no name exactly matches the string" do
+    get :index, {_format: :json, "given:exact" => "W"}
+    assert_equal 0, JSON.parse(response.body)['entry'].length
+  end
 end

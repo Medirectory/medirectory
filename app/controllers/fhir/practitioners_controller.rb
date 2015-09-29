@@ -94,7 +94,7 @@ module Fhir
       #  If the same param appears twice (name=blah&name=bleh) it's an AND operation
       #  If a param contains a comma though (name=blah,bleh) it's an OR operation
       #    (this is only true if the comma is not preceded by a \)
-      queries = Fhir::Parser.parse_params_to_sql(request.original_url.split('?').second, Fhir::PractitionerParser)
+      queries = Fhir::Parser.parse_params_to_sql(URI.unescape(request.original_url.split('?').second), Fhir::PractitionerParser)
       providers = Provider.all
       queries.each do |query|
         providers = providers.where(query) if query
