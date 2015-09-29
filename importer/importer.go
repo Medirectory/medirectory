@@ -165,6 +165,9 @@ var fileFlag string
 var dbFlag string
 var db *sql.DB
 
+var providerId int
+var organizationId int
+
 var (
 	providerTable           = "providers"
 	organizationTable       = "organizations"
@@ -191,6 +194,9 @@ func init() {
 		taxonomyGroupTable = "t_" + taxonomyGroupTable
 		prepUpdate()
 	}
+
+	providerId = fetchId("providers_id_seq")
+	organizationId = fetchId("organizations_id_seq")
 
 }
 
@@ -261,6 +267,9 @@ func main() {
 		logIfFatal(err)
 	}
 
+	updateSequence("providers_id_seq", providerId)
+	updateSequence("organizations_id_seq", organizationId)
+
 	fmt.Println("Finished parsing", time.Now())
 
 }
@@ -274,35 +283,15 @@ func underscore(string string) string {
 	return strings.Replace(string, " ", "_", -1)
 }
 
-func fetchId(npi string, entityType string) string {
-	var entityTypeStr string
-	var seqName string
+func fetchId(seqName string) int {
 	var id int
-	var err error
 
-	switch entityType {
-	case "1":
-		entityTypeStr = "Provider"
-		seqName = "providers_id_seq"
-		break
-	case "2":
-		entityTypeStr = "Organization"
-		seqName = "organizations_id_seq"
-		break
-	case "":
-		//fmt.Println("empty entity_type")
-		return ""
-	}
-	if npi == "" {
-		err = db.QueryRow("select nextval('" + seqName + "')").Scan(&id)
-	} else {
-		err = db.QueryRow("with entity_id_query as (select entity_id, 1 as id_exists from provider_identifiers where identifier = $1 and entity_type = $2 limit 1) select case when exists (select id_exists from entity_id_query) then (select entity_id from entity_id_query) else nextval($3) end as entity_id", npi, entityTypeStr, seqName).Scan(&id)
-		//err = db.QueryRow("select case when exists (select entity_id from provider_identifiers where identifier = $1 and entity_type = $2) then (select entity_id from provider_identifiers where identifier = $1 and entity_type = $2) else nextval($3) end as entity_type;", npi, entityTypeStr, seqName).Scan(&id)
-	}
+	err := db.QueryRow("select nextval('" + seqName + "')").Scan(&id)
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	return strconv.Itoa(id)
+	return id
 }
 
 // notAllNull feels hacky, but should allow us to remove completely null values from the inserts
@@ -345,26 +334,35 @@ func insertData(headers []string, recordMap map[string]string, stmt *sql.Stmt, r
 }
 
 func insert(recordMap map[string]string, stmts map[string]*sql.Stmt) {
-	
-	if updateFlag {
-		/*id, exists := checkForNpi(recordMap["npi"])
-		if exists {
-			recordMap["entity_id"] = strconv.Itoa(id)
-		} else {
-			recordMap["entity_id"] = fetchId(recordMap["entity_type_code"])
-		}
-		*/
-		recordMap["entity_id"] = fetchId(recordMap["npi"], recordMap["entity_type_code"])
-	} else {
-		recordMap["entity_id"] = fetchId("", recordMap["entity_type_code"])
-	}
-	//recordMap["entity_id"] = strconv.Itoa(fetchId(recordMap["npi"], recordMap["entity_type_code"]))
 
-	
 	if recordMap["entity_type_code"] == "1" {
+		if updateFlag {
+			id, exists := checkForNpi(recordMap["npi"])
+			if exists {
+				recordMap["entity_id"] = strconv.Itoa(id)
+			} else {
+				recordMap["entity_id"] = strconv.Itoa(providerId)
+				defer func() { providerId++ }()
+			}
+		} else {
+			recordMap["entity_id"] = strconv.Itoa(providerId)
+			defer func() { providerId++ }()
+		}
 		insertData(providerHeaders[:], recordMap, stmts["providers"], 1, nil)
 		recordMap["entity_type"] = "Provider"
 	} else if recordMap["entity_type_code"] == "2" {
+		if updateFlag {
+			id, exists := checkForNpi(recordMap["npi"])
+			if exists {
+				recordMap["entity_id"] = strconv.Itoa(id)
+			} else {
+				recordMap["entity_id"] = strconv.Itoa(organizationId)
+				defer func() { organizationId++ }()
+			}
+		} else {
+			recordMap["entity_id"] = strconv.Itoa(organizationId)
+			defer func() { organizationId++ }()
+		}
 		insertData(organizationHeaders[:], recordMap, stmts["organizations"], 1, nil)
 		recordMap["entity_type"] = "Organization"
 	} else if recordMap["entity_type_code"] == "" {
@@ -432,6 +430,16 @@ func checkForNpi(npi string) (int, bool) {
 		log.Fatal(err)
 	}
 	return entity_id, true
+}
+
+func updateSequence(seqName string, value int) {
+	var id int
+
+	err := db.QueryRow("select setval($1, $2, true)", seqName, value).Scan(&id)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func insertForDeletion(npi string) {
@@ -742,6 +750,5 @@ func update() {
 	logIfFatal(err)
 
 	fmt.Println("Finished updating", time.Now())
-
 
 }
