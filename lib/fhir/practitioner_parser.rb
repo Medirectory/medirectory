@@ -9,9 +9,24 @@ module Fhir
       }
       T = Provider.arel_table
 
+      def self.parse_matches_left(name, split_values)
+        to_return = nil
+        match_values = split_values.map {|value| value.to_s+"%"}
+        case name
+        when "name"
+          to_return = T[:first_name].matches_any(match_values).or(
+            T[:last_name_legal_name].matches_any(match_values)
+            )
+        else
+          to_return = T[LOOKUP_STRINGS[name.intern]].matches_any(match_values) if LOOKUP_STRINGS[name.intern]
+          to_return = T[LOOKUP_TOKENS[name.intern]].eq_any(split_values) if LOOKUP_TOKENS[name.intern]
+        end
+        to_return
+      end
+
       def self.parse_matches(name, split_values)
         to_return = nil
-        match_values = split_values.map {|value| '%'+value.to_s+'%'}
+        match_values = split_values.map {|value| "%"+value.to_s+"%"}
         case name
         when "name"
           to_return = T[:first_name].matches_any(match_values).or(

@@ -4,5 +4,5 @@ xml.line(value: address.first_line) if address.first_line
 xml.line(value: address.second_line) if address.second_line
 xml.city(value: address.city )
 xml.state(value: address.state )
-xml.zip(value: address.postal_code )
+xml.postalCode(value: address.postal_code )
 xml.country(value: address.country_code )

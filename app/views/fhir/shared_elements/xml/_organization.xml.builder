@@ -1,27 +1,26 @@
 xml.Organization(xmlns:"http://hl7.org/fhir") do
   xml.identifier do
     xml.use(value: "official")
-    xml.label(value: "NPI")
     xml.system(value: "https://nppes.cms.hhs.gov/NPPES/")
     xml.value(value: organization.npi)
   end
 
   xml.name(value: organization.organization_name_legal_business_name)
   # Assuming the only orgs are providers (for now)
-  xml.type do
-    xml << render(partial: 'fhir/shared_elements/xml/codeable_concept.xml.builder',
-      locals: {codings: [{code: "prov", display: "Healthcare Provider"}], text: nil})
-  end
+  # xml.type do
+  #   xml << render(partial: 'fhir/shared_elements/xml/codeable_concept.xml.builder',
+  #     locals: {codings: [{code: "prov", display: "Healthcare Provider"}], text: nil})
+  # end
 
 
   telecoms = []
-  telecoms = telecoms + [{ system: "phone", number: organization.mailing_address.telephone_number, period: nil },
-    { system: "fax", number: organization.mailing_address.fax_number, period: nil }] if organization.mailing_address
-  telecoms = telecoms + [{ system: "phone", number: organization.practice_location_address.telephone_number, period: nil },
-    { system: "fax", number: organization.practice_location_address.fax_number, period: nil }] if organization.practice_location_address
+  telecoms = telecoms + [{ system: "phone", value: organization.mailing_address.telephone_number, rank: nil, period: nil },
+    { system: "fax", value: organization.mailing_address.fax_number, rank: nil, period: nil }] if organization.mailing_address
+  telecoms = telecoms + [{ system: "phone", value: organization.practice_location_address.telephone_number, rank: nil, period: nil },
+    { system: "fax", value: organization.practice_location_address.fax_number, rank: nil, period: nil }] if organization.practice_location_address
   telecoms.each do |locals|
     xml.telecom do
-      xml << render(partial: 'fhir/shared_elements/xml/contact.xml.builder', locals: locals)
+      xml << render(partial: 'fhir/shared_elements/xml/contact_point.xml.builder', locals: locals)
     end unless locals[:number].blank?
   end
 
@@ -31,18 +30,24 @@ xml.Organization(xmlns:"http://hl7.org/fhir") do
     end if address
   end
 
-  # This may be something to try in the near future
-  # <partOf><!-- 0..1 Resource(Organization) The organization of which this organization forms a part --></partOf>
-  # <contact>  <!-- 0..* Contact for the organization for a certain purpose -->
-  #   <purpose><!-- 0..1 CodeableConcept The type of contact --></purpose>
-  #   <name><!-- 0..1 HumanName A name associated with the contact --></name>
-  #   <telecom><!-- 0..* Contact Contact details (telephone, email, etc)  for a contact --></telecom>
-  #   <address><!-- 0..1 Address Visiting or postal addresses for the contact --></address>
-  #   <gender><!-- 0..1 CodeableConcept Gender for administrative purposes --></gender>
-  # </contact>
-
-  # Possibly use the practice_location_address?
-  # <location><!-- 0..* Resource(Location) Location(s) the organization uses to provide services --></location>
-
-  # <active value="[boolean]"/><!-- 0..1 Whether the organization's record is still in active use -->
+  xml.contact do
+    xml.name do
+      xml << render(partial: "fhir/shared_elements/xml/human_name.xml.builder", locals: {
+        code: "official",
+        last_name: organization.authorized_official_last_name,
+        first_name: organization.authorized_official_first_name,
+        middle_name: organization.authorized_official_middle_name,
+        prefix: organization.authorized_official_name_prefix,
+        suffix: organization.authorized_official_name_suffix
+      })
+    end
+    xml.telecom do
+      xml << render(partial: 'fhir/shared_elements/xml/contact_point.xml.builder', locals: {
+        system: "phone",
+        value: organization.authorized_official_telephone_number,
+        rank: nil,
+        period: nil
+      })
+    end if organization.authorized_official_telephone_number
+  end if organization.authorized_official_last_name
 end

@@ -8,8 +8,15 @@ module Fhir
     }
     T = Organization.arel_table
 
+    def self.parse_matches_left(name, split_values)
+      match_values = split_values.map {|value| value.to_s+"%"}
+      to_return = T[LOOKUP_TOKENS[name.intern]].eq_any(split_values) if LOOKUP_TOKENS[name.intern]
+      to_return = T[LOOKUP_NAMES[name.intern]].matches_any(match_values) if LOOKUP_NAMES[name.intern]
+      to_return
+    end
+
     def self.parse_matches(name, split_values)
-      match_values = split_values.map {|value| '%'+value.to_s+'%'}
+      match_values = split_values.map {|value| "%"+value.to_s+"%"}
       to_return = T[LOOKUP_TOKENS[name.intern]].eq_any(split_values) if LOOKUP_TOKENS[name.intern]
       to_return = T[LOOKUP_NAMES[name.intern]].matches_any(match_values) if LOOKUP_NAMES[name.intern]
       to_return

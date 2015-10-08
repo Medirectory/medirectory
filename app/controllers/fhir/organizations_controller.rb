@@ -11,41 +11,30 @@ module Fhir
     example '
     {
       "resourceType": "Bundle",
-      "title": "[SEARCH TITLE]",
+      "type": "searchset",
+      "total": [NUMBER],
       "link": [{
-        "rel": "self",
-        "href": "[LINK]"
+        "relation": "self",
+        "url": "[LINK]"
       }, {
-        "rel": "first",
-        "href": "[LINK]"
+        "relation": "first",
+        "url": "[LINK]"
       }, {
-        "rel": "previous",
-        "href": "[LINK]"
+        "relation": "previous",
+        "url": "[LINK]"
       }, {
-        "rel": "next",
-        "href": "[LINK]"
+        "relation": "next",
+        "url": "[LINK]"
       }, {
-        "rel": "last",
-        "href": "[LINK]"
+        "relation": "last",
+        "url": "[LINK]"
       }, {
-        "rel": "base",
-        "href": "[LINK]"
-      }],
-      "totalResults": [NUMBER],
-      "id": "[URI]",
-      "author": [{
-        "name": "Medirectory"
+        "relation": "base",
+        "url": "[LINK]"
       }],
       "entry": [{
-        "title": "[ORG NAME]",
-        "id": "[URI]",
-        "updated": "[DATE]",
-        "published": "[DATE]]",
-        "author": [{
-          "name": "National Plan & Provider Enumeration System",
-          "uri": "https://nppes.cms.hhs.gov"
-        }],
-        "content": {
+        "fullUrl": "[URL]",
+        "resource": {
           "resourceType": "Organization",
           "identifier": [{
             "use": "[USE TYPE]",
@@ -54,12 +43,6 @@ module Fhir
             "value": "[ID VALUE]"
           }],
           "name": "[NAME]",
-          "type": {
-            "coding": [{
-              "code": "[ORG CODE]",
-              "display": "[DISPLAY TEXT]"
-            }]
-          },
           "telecom": [{
             "system": "[SYSTEM TYPE]",
             "value": "[ACCESS]",
@@ -73,7 +56,20 @@ module Fhir
             "state": "[STATE]",
             "zip": "[ZIP]",
             "country": "[COUNTRY]"
-          }]
+          }],
+          "contact": {
+            "name": {
+              "use": "[USE TYPE]",
+              "text": "[NAME TO DISPLAY]",
+              "family": ["LAST_NAME"],
+              "given": ["[FIRST_NAME]", "[MIDDLE_NAME]"]
+            },
+            "telecom": [{
+              "system": "[SYSTEM TYPE]",
+              "value": "[ACCESS]",
+              "use": "[USE TYPE]"
+            }]
+          }
         }
       }]
     }'
@@ -89,7 +85,7 @@ module Fhir
       #  If the same param appears twice (name=blah&name=bleh) it's an AND operation
       #  If a param contains a comma though (name=blah,bleh) it's an OR operation
       #    (this is only true if the comma is not preceded by a \)
-      queries = Fhir::Parser.parse_params_to_sql(request.original_url.split('?').second, Fhir::OrganizationParser)
+      queries = Fhir::Parser.parse_params_to_sql(URI.unescape(request.original_url.split('?').second), Fhir::OrganizationParser)
       organizations = Organization.all
       queries.each do |query|
         organizations = organizations.where(query) if query
@@ -146,12 +142,6 @@ module Fhir
         "value": "[ID VALUE]"
       }],
       "name": "[NAME]",
-      "type": {
-        "coding": [{
-          "code": "[ORG CODE]",
-          "display": "[DISPLAY TEXT]"
-        }]
-      },
       "telecom": [{
         "system": "[SYSTEM TYPE]",
         "value": "[ACCESS]",
@@ -165,7 +155,20 @@ module Fhir
         "state": "[STATE]",
         "zip": "[ZIP]",
         "country": "[COUNTRY]"
-      }]
+      }],
+      "contact": {
+        "name": {
+          "use": "[USE TYPE]",
+          "text": "[NAME TO DISPLAY]",
+          "family": ["LAST_NAME"],
+          "given": ["[FIRST_NAME]", "[MIDDLE_NAME]"]
+        },
+        "telecom": [{
+          "system": "[SYSTEM TYPE]",
+          "value": "[ACCESS]",
+          "use": "[USE TYPE]"
+        }]
+      }
     }'
     param :_format,               String,  :desc => "Defaults to xml.  Choice of xml or json."
     param :id,                    String,  :desc => "ID for the organization resource."

@@ -12,6 +12,7 @@ Rails.application.routes.draw do
 
   namespace :fhir do
     resources :metadata, only: [:index], defaults: { format: "xml" }
+    post 'practitioners/_search', to: 'practioners#index'
     resources :practitioners, only: [:index, :show], defaults: { format: "xml" }
     resources :organizations, only: [:index, :show], defaults: { format: "xml" }
   end

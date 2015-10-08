@@ -37,9 +37,13 @@ class FhirOrganizationsControllerTest < ActionController::TestCase
     end
   end
 
-  test "should return the right number of fhir orgs" do
-    get :index, {_format: :json}
-    assert_equal 6, JSON.parse(response.body)['entry'].length
+  test "should return fhir orgs with particular name" do
+    get :index, {_format: :json, "name" => "ST"}
+    assert_equal 1, JSON.parse(response.body)['entry'].length
   end
 
+  test "should return fhir orgs containing particular name piece" do
+    get :index, {_format: :json, "name:contains" => "ST"}
+    assert_equal 3, JSON.parse(response.body)['entry'].length
+  end
 end

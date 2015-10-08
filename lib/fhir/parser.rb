@@ -14,13 +14,16 @@ module Fhir
         if modifier == 'exact'
           # parse exact (no %)
           queries << fhir_resource_parser.parse_exact(actual_name, split_values)
+        elsif modifier == 'contains'
+          # parse missing (true or false)
+          queries << fhir_resource_parser.parse_matches(actual_name, split_values)
         elsif modifier == 'missing'
           # parse missing (true or false)
           missing = split_values.first == 'true'
           queries << fhir_resource_parser.parse_missing_modifier(actual_name, missing)
         else
           # Just use base. Only handling strings at the moments, so partials (%)
-          queries << fhir_resource_parser.parse_matches(actual_name, split_values)
+          queries << fhir_resource_parser.parse_matches_left(actual_name, split_values)
         end
       end if all_params
       queries
