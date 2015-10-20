@@ -45,6 +45,8 @@ The Medirectory backend is a Ruby on Rails application. In order to work with th
 
 * [Ruby](https://www.ruby-lang.org/)
 
+* [Go](https://golang.org/)
+
 * [Postgres](http://www.postgresql.org/)
 
 Once the prequesites are available, Medirectory can be installed and data can be imported and indexed.
