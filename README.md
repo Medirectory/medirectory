@@ -2,11 +2,11 @@
 
 Medirectory is a prototype healthcare directory, built to explore the technical aspects of building a directory. Medirectory
 
-* Is populated using the NPPES provider and organization data sets, along with the Physician Compare data set
+* Is populated using the National Plan & Provider Enumeration System (NPPES) provider and organization data sets, along with the Physician Compare data set
 
 * Provides a robust RESTful interface, designed for machine-to-machine communication, providing
 
-  * search by basic information like name, location, specialty, and NPI
+  * search by basic information like name, location, specialty, and National Provider Identifier (NPI)
 
   * complex queries using organizational relationships
 
@@ -37,7 +37,7 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 ### Installation and Setup
 
-The Medirectory backend is a Ruby on Rails application. In order to work with the application, you will need to install some prequesites.
+The Medirectory backend is a Ruby on Rails application. In order to work with the application, you will need to install some prerequisites.
 
 #### Prerequisites
 
@@ -49,7 +49,7 @@ The Medirectory backend is a Ruby on Rails application. In order to work with th
 
 * [Postgres](http://www.postgresql.org/)
 
-Once the prequesites are available, Medirectory can be installed and data can be imported and indexed.
+Once the prerequisites are available, Medirectory can be installed and data can be imported and indexed.
 
 #### Setup
 
@@ -65,7 +65,7 @@ Once the prequesites are available, Medirectory can be installed and data can be
 
     `bundle exec rake db:drop db:create db:migrate RAILS_ENV=development`
 
-* Load taxonomy information (information on provider specializatiopns)
+* Load taxonomy information (information on provider specializations)
 
     `bundle exec rake medirectory:load_taxonomy_map`
 
@@ -75,23 +75,23 @@ Once the prequesites are available, Medirectory can be installed and data can be
 
     `go run db/parsing/csvRun.go medirectory_development [CSV FILE]`
 
-* Match providers and organizations using a heuristic algorithm
+* Match providers and organizations and create database associations; this uses a heuristic algorithm, and should be considered suitable only for testing and demonstration purposes
 
     `bundle exec rake medirectory:match_providers_organizations`
 
-* Optionally download the [Physicial Compare data file](https://data.medicare.gov/data/physician-compare) and load it, replacing [CSV FILE] with the actual file name
+* Optionally download the [Physical Compare data file](https://data.medicare.gov/data/physician-compare) and load it, replacing [CSV FILE] with the actual file name; this adds more associations between providers and organizations
 
     `bundle exec rake medirectory:add_physician_compare_data FILE='[CSV FILE]'`
 
-* Populate the search indexes; this may take some time
+* Populate the search indexes, which allow for rapid processing of search queries; this may take some time
 
     `bundle exec rake medirectory:populate_search`
 
-* Populate Electronic Service Information with synthetic data
+* Populate Electronic Service Information with synthetic data; this creates a fake Direct email address for all providers, and should be considered suitable only for testing and demonstration purposes
 
     `bundle exec rake medirectory:populate_electronic_services`
 
-* Set up geospatial search indexes
+* Set up geospatial search indexes; this allows for location based searching
 
     `bundle exec rake medirectory:load_zip_codes`
 
@@ -101,7 +101,7 @@ Once the prequesites are available, Medirectory can be installed and data can be
 
 * Run tests
 
-    `bundle exec rake db:drop db:create db:migrate RAILS_ENV=test` (first time only)
+    `bundle exec rake db:drop db:create db:migrate RAILS_ENV=test` (creates test DB, needed first time only)
 
     `bundle exec rake test`
 
