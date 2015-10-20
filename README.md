@@ -94,12 +94,15 @@ Once the prequesites are available, Medirectory can be installed and data can be
 * Set up geospatial search indexes
 
     `bundle exec rake medirectory:load_zip_codes`
+
     `bundle exec rake medirectory:match_addresses_to_lat_long`
+
     `bundle exec rake medirectory:populate_lat_long`
 
 * Run tests
 
     `bundle exec rake db:drop db:create db:migrate RAILS_ENV=test` (first time only)
+
     `bundle exec rake test`
 
 * Run the application server
