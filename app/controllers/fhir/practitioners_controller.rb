@@ -1,5 +1,3 @@
-require 'fhir/parser'
-require 'fhir/practitioner_parser'
 module Fhir
   class PractitionersController < ApplicationController
     LOAD_INCLUDES = [:mailing_address, :practice_location_address, :other_provider_identifiers,
@@ -94,7 +92,7 @@ module Fhir
       #  If the same param appears twice (name=blah&name=bleh) it's an AND operation
       #  If a param contains a comma though (name=blah,bleh) it's an OR operation
       #    (this is only true if the comma is not preceded by a \)
-      queries = Fhir::Parser.parse_params_to_sql(URI.unescape(request.original_url.split('?').second), Fhir::PractitionerParser)
+      queries = Fhir::Parser.parse_params_to_sql(URI.unescape(request.original_url.split('?').second.to_s), Fhir::PractitionerParser)
       providers = Provider.all
       queries.each do |query|
         providers = providers.where(query) if query

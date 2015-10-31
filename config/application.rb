@@ -28,5 +28,8 @@ module Medirectory
 
     # Use SQL for schema to preserve indexes
     config.active_record.schema_format = :sql
+
+    # Autoload files in lib
+    config.autoload_paths << Rails.root.join('lib')
   end
 end
